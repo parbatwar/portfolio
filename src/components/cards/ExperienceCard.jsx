@@ -1,53 +1,56 @@
+// ExperienceCard.jsx
 import { motion } from 'framer-motion'
 
 function ExperienceCard() {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-      className="bg-zinc-900 border border-white/10 rounded-3xl p-6 h-full flex flex-col justify-between"
+      whileHover={{ borderColor: 'rgba(255,255,255,0.13)' }}
+      className="w-full h-full bg-[#0e0e12] border border-white/[0.07] rounded-[10px] p-5 flex flex-col justify-between min-h-[180px]"
     >
-      <div>
-        <h3 className="text-xs font-semibold tracking-widest text-zinc-500 uppercase mb-6">
-          Experience
-        </h3>
+      <span className="text-[9px] font-semibold tracking-[0.14em] uppercase text-zinc-600">
+        Experience
+      </span>
 
-        {/* Core Timeline Item */}
-        <div className="relative pl-4 border-l border-white/10">
-          <div className="absolute w-2 h-2 bg-white rounded-full -left-[4.5px] top-1.5" />
-          
-          <div className="flex flex-wrap items-baseline justify-between gap-x-2 mb-1">
-            <h4 className="text-lg font-bold text-zinc-100">Software Engineer Intern</h4>
-            <span className="text-xs text-zinc-500 font-medium">2025 - Present</span>
-          </div>
-          
-          <p className="text-sm font-medium text-zinc-400 mb-4">
+      {/* Timeline */}
+      <div className="flex gap-3 mt-4 flex-1">
+        <div className="flex flex-col items-center">
+          <div className="w-[7px] h-[7px] rounded-full bg-zinc-100 flex-shrink-0 mt-0.5" />
+          <div className="w-px bg-white/[0.07] flex-grow mt-1" />
+        </div>
+        <div className="flex flex-col gap-1 pb-2">
+          <span className="text-[12px] font-bold tracking-[-0.01em] text-zinc-200 leading-tight">
+            Software Engineer Intern
+          </span>
+          <span className="text-[9px] font-medium text-zinc-600">
             Development Team Lead
-          </p>
+          </span>
+          <span className="text-[9px] font-semibold tracking-[0.08em] text-zinc-700 mt-0.5">
+            2025 – Present
+          </span>
 
-          {/* Highlights of technical domain competencies inside your internship */}
-          <div className="space-y-2 mt-4">
-            <div className="text-xs text-zinc-500 font-semibold tracking-wider uppercase mb-2">
-              Key Contributions
-            </div>
-            <ul className="text-xs text-zinc-400 space-y-1.5 list-disc pl-4 leading-relaxed">
-              <li>Designed and decoupled architectural backend services utilizing persistent data layers.</li>
-              <li>Engineered AI-driven natural language parsing and text-analysis pipelines for document processing.</li>
-              <li>Managed core project source repositories, repository branch mapping, and code integrations.</li>
-            </ul>
-          </div>
+          <ul className="mt-3 space-y-1.5 list-none">
+            {[
+              'Designed decoupled backend services with persistent data layers.',
+              'Built AI-driven NLP pipelines for document processing.',
+              'Managed source repos, branching strategy, and CI integrations.',
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className="text-zinc-700 mt-0.5 text-[10px]">—</span>
+                <span className="text-[9.5px] text-zinc-500 leading-relaxed font-light">{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 
-      {/* Tech Stack micro tags at the bottom */}
-      <div className="mt-6 pt-4 border-t border-white/5 flex flex-wrap gap-1.5">
-        {['React', '.NET', 'Django', 'PostgreSQL', 'Git'].map((tech) => (
-          <span 
-            key={tech} 
-            className="text-[10px] tracking-wider text-zinc-400 bg-zinc-950 border border-white/5 px-2 py-1 rounded-md"
+      {/* Tech tags */}
+      <div className="flex flex-wrap gap-1.5 pt-3 border-t border-white/[0.05]">
+        {['React', '.NET', 'Django', 'PostgreSQL', 'Git'].map((t) => (
+          <span
+            key={t}
+            className="text-[8.5px] font-medium text-zinc-500 bg-white/[0.04] border border-white/[0.07] rounded-[5px] px-2 py-1"
           >
-            {tech}
+            {t}
           </span>
         ))}
       </div>

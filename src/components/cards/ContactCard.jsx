@@ -3,79 +3,75 @@ import { info } from '../../data/info'
 
 function ContactCard() {
   const { email, location, socials } = info
-  
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
-      className="bg-zinc-900 border border-white/10 rounded-3xl p-6 w-full h-full flex flex-col justify-between"
+      whileHover={{ borderColor: 'rgba(255,255,255,0.13)' }}
+      className="w-full h-full bg-[#0e0e12] border border-white/[0.07] rounded-[10px] p-5 flex flex-col justify-between min-h-[280px]"
     >
+      {/* Top */}
       <div>
-        <h3 className="text-xs font-semibold tracking-widest text-zinc-500 uppercase mb-6">
-          Contact Details
-        </h3>
-        
-        {/* Email Block */}
+        <span className="text-[9px] font-semibold tracking-[0.14em] uppercase text-zinc-600">
+          Contact
+        </span>
+
+        {/* Email block */}
         <a
           href={`mailto:${email}`}
-          className="group block p-4 bg-zinc-950 border border-white/5 rounded-2xl mb-6 hover:border-white/20 transition-all"
+          className="group/email flex items-center justify-between mt-4 mb-3
+                     bg-white/[0.03] border border-white/[0.06] rounded-[8px] 
+                     px-3 py-2.5 hover:border-white/[0.12] transition-all"
         >
-          <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Direct Email</p>
-          <p className="text-sm font-medium text-zinc-200 break-all group-hover:text-white transition-colors">
-            {email}
-          </p>
-        </a>
-        
-        {/* Social Links Block */}
-        <div className="space-y-3">
-          <p className="text-xs text-zinc-500 uppercase tracking-wider">Profiles</p>
-          
-          <div className="flex flex-col gap-2">
-            {socials.github && (
-              <a
-                href={socials.github}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-between p-3 bg-zinc-950 border border-white/5 rounded-xl hover:border-white/15 transition-all text-sm text-zinc-300 hover:text-white"
-              >
-                <span className="font-medium">GitHub</span>
-                <span className="text-xs text-zinc-600">↗</span>
-              </a>
-            )}
-            
-            {socials.linkedin && (
-              <a
-                href={socials.linkedin}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-between p-3 bg-zinc-950 border border-white/5 rounded-xl hover:border-white/15 transition-all text-sm text-zinc-300 hover:text-white"
-              >
-                <span className="font-medium">LinkedIn</span>
-                <span className="text-xs text-zinc-600">↗</span>
-              </a>
-            )}
-            
-            {socials.twitter && (
-              <a
-                href={socials.twitter}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-between p-3 bg-zinc-950 border border-white/5 rounded-xl hover:border-white/15 transition-all text-sm text-zinc-300 hover:text-white"
-              >
-                <span className="font-medium">Twitter</span>
-                <span className="text-xs text-zinc-600">↗</span>
-              </a>
-            )}
+          <div>
+            <p className="text-[8.5px] text-zinc-600 uppercase tracking-[0.1em] mb-0.5">
+              Direct Email
+            </p>
+            <p className="text-[10.5px] font-medium text-zinc-300 group-hover/email:text-white transition-colors">
+              {email}
+            </p>
           </div>
+          <span className="text-zinc-700 text-xs group-hover/email:text-zinc-400 
+                           group-hover/email:translate-x-0.5 group-hover/email:-translate-y-0.5 
+                           transition-all">↗</span>
+        </a>
+
+        {/* Social links */}
+        <div className="flex flex-col gap-1.5">
+          {[
+            { label: 'GitHub',   href: socials?.github },
+            { label: 'LinkedIn', href: socials?.linkedin },
+            { label: 'Twitter',  href: socials?.twitter },
+          ]
+            .filter((s) => s.href)
+            .map((s) => (
+              <a
+                key={s.label}
+                href={s.href}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between
+                           bg-white/[0.03] border border-white/[0.06] rounded-[8px]
+                           px-3 py-2 hover:border-white/[0.12] hover:bg-white/[0.05]
+                           transition-all group/link"
+              >
+                <span className="text-[10px] font-medium text-zinc-400 group-hover/link:text-zinc-200 transition-colors">
+                  {s.label}
+                </span>
+                <span className="text-[10px] text-zinc-700 group-hover/link:text-zinc-400
+                                 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5
+                                 transition-all">↗</span>
+              </a>
+            ))}
         </div>
       </div>
-      
-      {/* Location footer block */}
+
+      {/* Footer — location */}
       {location && (
-        <div className="mt-8 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-zinc-500">
-          <span className="tracking-wider uppercase">Location</span>
-          <span className="text-zinc-400 font-medium">{location}</span>
+        <div className="flex items-center justify-between pt-3 border-t border-white/[0.05] mt-4">
+          <span className="text-[9px] font-semibold tracking-[0.14em] uppercase text-zinc-700">
+            Location
+          </span>
+          <span className="text-[9px] font-medium text-zinc-500">{location}</span>
         </div>
       )}
     </motion.div>
