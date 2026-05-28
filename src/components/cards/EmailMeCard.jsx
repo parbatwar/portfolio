@@ -1,18 +1,32 @@
+// components/cards/EmailMeCard.jsx
+
+import { motion } from 'framer-motion'
+
 function EmailMeCard() {
   return (
-    <div className="w-full bg-[#0e0e12] border border-white/[0.07] rounded-[10px] p-5 flex flex-col justify-between group cursor-pointer hover:border-white/[0.13] transition-all min-h-[180px]">
-      <div className="flex justify-between items-start w-full">
-        <p className="text-[10px] text-zinc-600 leading-relaxed">Want to<br />collaborate?</p>
-        <span className="text-sm text-zinc-700 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span>
-      </div>
-      <div>
-        <div className="inline-flex items-center gap-1.5 bg-white/[0.04] border border-white/[0.07] rounded-full px-2.5 py-1 mb-3">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
-          <span className="text-[9px] font-medium text-zinc-500">Available for freelance</span>
+    <motion.a
+      href="mailto:hello@parbat.com"
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.2 }}
+      className="block w-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 rounded-2xl p-6 hover:border-emerald-500/40 transition-all group cursor-pointer"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">✉️</span>
+          <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+            Get in touch
+          </span>
         </div>
-        <h3 className="text-xl font-bold tracking-tight text-zinc-100">Email Me</h3>
+        <span className="text-2xl text-emerald-400 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform">
+          →
+        </span>
       </div>
-    </div>
+      
+      <h3 className="text-xl font-semibold text-white mb-2">Let's work together</h3>
+      <p className="text-sm text-zinc-400">
+        I'm always open to discussing new projects and opportunities.
+      </p>
+    </motion.a>
   )
 }
 

@@ -1,58 +1,108 @@
-// ExperienceCard.jsx
-import { motion } from 'framer-motion'
+// components/cards/ExperienceCard.jsx
+
+import { useRef } from 'react'
+import { motion, useMotionValue, useTransform, useMotionTemplate } from 'framer-motion'
 
 function ExperienceCard() {
+  const ref = useRef(null)
+
+  // 3D tilt
+  const tiltX = useMotionValue(0)
+  const tiltY = useMotionValue(0)
+  const rotateX = useTransform(tiltY, [-0.5, 0.5], [5, -5])
+  const rotateY = useTransform(tiltX, [-0.5, 0.5], [-5, 5])
+  
+  // Spotlight
+  const spotlightX = useMotionValue(0)
+  const spotlightY = useMotionValue(0)
+  
+  const handleMouseMove = (e) => {
+    if (!ref.current) return
+    const rect = ref.current.getBoundingClientRect()
+    tiltX.set((e.clientX - rect.left) / rect.width - 0.5)
+    tiltY.set((e.clientY - rect.top) / rect.height - 0.5)
+    spotlightX.set(e.clientX - rect.left)
+    spotlightY.set(e.clientY - rect.top)
+  }
+
+  const handleMouseLeave = () => {
+    tiltX.set(0)
+    tiltY.set(0)
+  }
+
+  const experience = {
+    role: 'Python Backend Developer Intern',
+    company: 'Tech Solutions Ltd.',
+    period: '2025 – Present',
+    details: [
+      'Developed and optimized backend server modules using Python, FastAPI, and Django, lowering server response time by 25%.',
+      'Created automated ETL scraping scripts to fetch and ingest large financial datasets into PostgreSQL databases.',
+      'Designed and executed complex SQL queries and set indexes, improving data fetch speeds for user-facing API routes.',
+      'Managed source control and repository versioning using Git, and participated in active code reviews.'
+    ],
+    tech: ['Python', 'Django', 'FastAPI', 'PostgreSQL', 'SQL', 'Git']
+  }
+
   return (
     <motion.div
-      whileHover={{ borderColor: 'rgba(255,255,255,0.13)' }}
-      className="w-full h-full bg-[#0e0e12] border border-white/[0.07] rounded-[10px] p-5 flex flex-col justify-between min-h-[180px]"
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: 'preserve-3d',
+      }}
+      className="w-full h-full flex flex-col justify-between bg-[#0d0d14] border border-white/[0.04] rounded-2xl p-6 hover:border-emerald-500/20 transition-all duration-300 glow-card group cursor-default"
     >
-      <span className="text-[9px] font-semibold tracking-[0.14em] uppercase text-zinc-600">
-        Experience
-      </span>
+      {/* Spotlight */}
+      <motion.div
+        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"
+        style={{
+          background: useMotionTemplate`
+            radial-gradient(
+              250px circle at ${spotlightX}px ${spotlightY}px,
+              rgba(16, 185, 129, 0.08),
+              transparent 80%
+            )
+          `,
+        }}
+      />
 
-      {/* Timeline */}
-      <div className="flex gap-3 mt-4 flex-1">
-        <div className="flex flex-col items-center">
-          <div className="w-[7px] h-[7px] rounded-full bg-zinc-100 flex-shrink-0 mt-0.5" />
-          <div className="w-px bg-white/[0.07] flex-grow mt-1" />
-        </div>
-        <div className="flex flex-col gap-1 pb-2">
-          <span className="text-[12px] font-bold tracking-[-0.01em] text-zinc-200 leading-tight">
-            Software Engineer Intern
-          </span>
-          <span className="text-[9px] font-medium text-zinc-600">
-            Development Team Lead
-          </span>
-          <span className="text-[9px] font-semibold tracking-[0.08em] text-zinc-700 mt-0.5">
-            2025 – Present
-          </span>
+      <div style={{ transform: 'translateZ(10px)' }} className="w-full">
+        <span className="text-[10px] font-mono tracking-widest text-emerald-400 uppercase mb-4 block">
+          // Professional Experience
+        </span>
 
-          <ul className="mt-3 space-y-1.5 list-none">
-            {[
-              'Designed decoupled backend services with persistent data layers.',
-              'Built AI-driven NLP pipelines for document processing.',
-              'Managed source repos, branching strategy, and CI integrations.',
-            ].map((item, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className="text-zinc-700 mt-0.5 text-[10px]">—</span>
-                <span className="text-[9.5px] text-zinc-500 leading-relaxed font-light">{item}</span>
+        <div className="border border-white/[0.04] bg-white/[0.01] rounded-xl p-4">
+          {/* Header */}
+          <div className="flex justify-between items-start gap-2 border-b border-white/[0.04] pb-3 mb-3">
+            <div>
+              <h3 className="text-sm font-bold text-white font-display">{experience.role}</h3>
+              <p className="text-xs text-emerald-400/80 font-mono mt-0.5">{experience.company}</p>
+            </div>
+            <span className="text-[10px] text-zinc-500 font-mono bg-white/[0.02] border border-white/[0.04] px-1.5 py-0.5 rounded whitespace-nowrap">{experience.period}</span>
+          </div>
+
+          {/* Details list */}
+          <ul className="space-y-2">
+            {experience.details.map((detail, index) => (
+              <li key={index} className="text-xs text-zinc-400 flex items-start gap-2 leading-relaxed">
+                <span className="text-emerald-400 mt-0.5 shrink-0">▹</span>
+                <span>{detail}</span>
               </li>
             ))}
           </ul>
-        </div>
-      </div>
 
-      {/* Tech tags */}
-      <div className="flex flex-wrap gap-1.5 pt-3 border-t border-white/[0.05]">
-        {['React', '.NET', 'Django', 'PostgreSQL', 'Git'].map((t) => (
-          <span
-            key={t}
-            className="text-[8.5px] font-medium text-zinc-500 bg-white/[0.04] border border-white/[0.07] rounded-[5px] px-2 py-1"
-          >
-            {t}
-          </span>
-        ))}
+          {/* Tech pills */}
+          <div className="flex flex-wrap gap-1.5 mt-4 pt-3 border-t border-white/[0.04]">
+            {experience.tech.map((t) => (
+              <span key={t} className="text-[9px] font-mono text-zinc-400 bg-white/[0.04] border border-white/[0.04] rounded px-2 py-0.5">
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </motion.div>
   )

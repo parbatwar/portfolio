@@ -1,201 +1,279 @@
-import { motion } from 'framer-motion'
-import { useState } from 'react'
+// components/cards/CapabilitiesAndContact.jsx
+
+import { useState, useRef } from 'react'
+import { motion, AnimatePresence, useMotionValue, useTransform, useMotionTemplate } from 'framer-motion'
 
 const capabilities = [
   {
-    num: '①',
+    icon: '🎨',
     title: 'Web / App Design',
-    desc: 'User-centered systems that blend structured technical layouts with fluid, intuitive interfaces across modern cross-platform devices.',
+    description: 'User-centered systems that blend technical layout grids with highly fluid, interactive user experiences.',
   },
   {
-    num: '②',
+    icon: '⚙️',
     title: 'Full-Stack Architecture',
-    desc: 'Deeply decoupled backend logic pipelines, persistent data repository patterns, and robust templates built for secure data handling.',
+    description: 'Decoupled API endpoints, persistent query caching layers, and high-performance PostgreSQL query design.',
   },
   {
-    num: '③',
+    icon: '🤖',
     title: 'Systems Engineering',
-    desc: 'AI-driven semantic text parsing pipelines, state engines, and custom microservice controllers optimized for processing performance.',
+    description: 'Automated workflow pipelines, Docker microservice orchestration, and AI model server integration.',
   },
 ]
 
 function CapabilitiesAndContact() {
-  const [sent, setSent] = useState(false)
-  const [form, setForm] = useState({ name: '', email: '', message: '' })
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
+  const [focusedField, setFocusedField] = useState(null)
+  const [status, setStatus] = useState('idle') // idle | submitting | success
+  
+  const refCap = useRef(null)
+  const refForm = useRef(null)
 
-  function handleSubmit(e) {
+  // 3D tilt for Capabilities
+  const tiltCapX = useMotionValue(0)
+  const tiltCapY = useMotionValue(0)
+  const rotateCapX = useTransform(tiltCapY, [-0.5, 0.5], [4, -4])
+  const rotateCapY = useTransform(tiltCapX, [-0.5, 0.5], [-4, 4])
+  const spotCapX = useMotionValue(0)
+  const spotCapY = useMotionValue(0)
+
+  // 3D tilt for Form
+  const tiltFormX = useMotionValue(0)
+  const tiltFormY = useMotionValue(0)
+  const rotateFormX = useTransform(tiltFormY, [-0.5, 0.5], [4, -4])
+  const rotateFormY = useTransform(tiltFormX, [-0.5, 0.5], [-4, 4])
+  const spotFormX = useMotionValue(0)
+  const spotFormY = useMotionValue(0)
+
+  const handleMouseMoveCap = (e) => {
+    if (!refCap.current) return
+    const rect = refCap.current.getBoundingClientRect()
+    tiltCapX.set((e.clientX - rect.left) / rect.width - 0.5)
+    tiltCapY.set((e.clientY - rect.top) / rect.height - 0.5)
+    spotCapX.set(e.clientX - rect.left)
+    spotCapY.set(e.clientY - rect.top)
+  }
+
+  const handleMouseLeaveCap = () => {
+    tiltCapX.set(0)
+    tiltCapY.set(0)
+  }
+
+  const handleMouseMoveForm = (e) => {
+    if (!refForm.current) return
+    const rect = refForm.current.getBoundingClientRect()
+    tiltFormX.set((e.clientX - rect.left) / rect.width - 0.5)
+    tiltFormY.set((e.clientY - rect.top) / rect.height - 0.5)
+    spotFormX.set(e.clientX - rect.left)
+    spotFormY.set(e.clientY - rect.top)
+  }
+
+  const handleMouseLeaveForm = () => {
+    tiltFormX.set(0)
+    tiltFormY.set(0)
+  }
+
+  const handleSubmit = (e) => {
     e.preventDefault()
-    setSent(true)
+    setStatus('submitting')
+    setTimeout(() => {
+      setStatus('success')
+      setFormData({ name: '', email: '', message: '' })
+      setTimeout(() => setStatus('idle'), 4000)
+    }, 1500)
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-stretch">
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      {/* Capabilities / Expertise (Span 2) */}
+      <motion.div
+        ref={refCap}
+        onMouseMove={handleMouseMoveCap}
+        onMouseLeave={handleMouseLeaveCap}
+        style={{
+          rotateX: rotateCapX,
+          rotateY: rotateCapY,
+          transformStyle: 'preserve-3d',
+        }}
+        className="lg:col-span-2 bg-[#0d0d14] border border-white/[0.04] rounded-2xl p-6 hover:border-emerald-500/20 transition-all duration-300 glow-card group cursor-default flex flex-col justify-between"
+      >
+        <motion.div
+          className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"
+          style={{
+            background: useMotionTemplate`
+              radial-gradient(
+                250px circle at ${spotCapX}px ${spotCapY}px,
+                rgba(16, 185, 129, 0.08),
+                transparent 80%
+              )
+            `,
+          }}
+        />
 
-      {/* ── Col 1: Expertise ── */}
-      <div className="md:col-span-4 bg-[#0e0e12] border border-white/[0.07] rounded-[10px] p-5 flex flex-col justify-between">
-        <div>
-          <span className="text-[9px] font-semibold tracking-[0.14em] uppercase text-zinc-600">
-            Expertise
+        <div style={{ transform: 'translateZ(10px)' }}>
+          <span className="text-[10px] font-mono tracking-widest text-emerald-400 uppercase mb-4 block">
+            // Core Expertise
           </span>
-
-          <div className="mt-4 flex flex-col">
-            {capabilities.map((cap, i) => (
-              <div
-                key={cap.num}
-                className={`py-4 ${i !== capabilities.length - 1 ? 'border-b border-white/[0.05]' : ''}`}
-              >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-[9px] font-mono text-zinc-700">{cap.num}</span>
-                  <h3 className="text-[11px] font-bold tracking-[-0.01em] text-zinc-200">
+          
+          <div className="space-y-6 mt-4">
+            {capabilities.map((cap) => (
+              <div key={cap.title} className="space-y-2 group/item">
+                <div className="flex items-center gap-3">
+                  <span className="text-xl p-2 bg-white/[0.02] border border-white/[0.04] rounded-lg group-hover/item:bg-emerald-500/10 group-hover/item:border-emerald-500/25 transition-all duration-300">
+                    {cap.icon}
+                  </span>
+                  <h3 className="text-sm font-bold text-white font-display group-hover/item:text-emerald-400 transition-colors">
                     {cap.title}
                   </h3>
                 </div>
-                <p className="text-[9.5px] text-zinc-500 leading-relaxed font-light pl-4">
-                  {cap.desc}
+                <p className="text-xs text-zinc-400 pl-11 leading-relaxed">
+                  {cap.description}
                 </p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Footer tags */}
-        <div className="flex flex-wrap gap-1.5 pt-4 border-t border-white/[0.05]">
-          {['Django', '.NET', 'React', 'Postgres'].map((t) => (
-            <span
-              key={t}
-              className="text-[8.5px] font-medium text-zinc-500 bg-white/[0.04] border border-white/[0.07] rounded-[5px] px-2 py-1"
-            >
-              {t}
+        {/* Mini Stack Footnote */}
+        <div 
+          className="flex flex-wrap gap-1.5 mt-6 pt-5 border-t border-white/[0.04]"
+          style={{ transform: 'translateZ(15px)' }}
+        >
+          {['DevOps', 'REST API', 'SPA', 'Relational DB'].map((tech) => (
+            <span key={tech} className="text-[9px] font-mono text-zinc-500 bg-white/[0.02] border border-white/[0.04] rounded px-2 py-0.5">
+              {tech}
             </span>
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      {/* ── Col 2: Contact Form ── */}
-      <div className="md:col-span-4 flex flex-col gap-3">
+      {/* Contact Form (Span 3) */}
+      <motion.div
+        ref={refForm}
+        onMouseMove={handleMouseMoveForm}
+        onMouseLeave={handleMouseLeaveForm}
+        style={{
+          rotateX: rotateFormX,
+          rotateY: rotateFormY,
+          transformStyle: 'preserve-3d',
+        }}
+        className="lg:col-span-3 bg-[#0d0d14] border border-white/[0.04] rounded-2xl p-6 hover:border-emerald-500/20 transition-all duration-300 glow-card group/form cursor-default"
+      >
+        <motion.div
+          className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 group-hover/form:opacity-100 transition duration-300"
+          style={{
+            background: useMotionTemplate`
+              radial-gradient(
+                350px circle at ${spotFormX}px ${spotFormY}px,
+                rgba(16, 185, 129, 0.08),
+                transparent 80%
+              )
+            `,
+          }}
+        />
 
-        {/* Availability badge */}
-        <div className="bg-[#0e0e12] border border-white/[0.07] rounded-[10px] px-4 py-3 flex items-center gap-2.5">
-          <span className="relative flex h-2 w-2 flex-shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+        <div style={{ transform: 'translateZ(10px)' }}>
+          <span className="text-[10px] font-mono tracking-widest text-emerald-400 uppercase mb-4 block">
+            // Secure Dispatch
           </span>
-          <span className="text-[9px] font-semibold tracking-[0.12em] uppercase text-zinc-400">
-            Available for Freelance
-          </span>
-        </div>
+          <h3 className="text-2xl font-bold font-display text-white mb-6">Send a Message</h3>
 
-        {/* Form */}
-        <div className="bg-[#0e0e12] border border-white/[0.07] rounded-[10px] p-5 flex-1 flex flex-col">
-          <span className="text-[9px] font-semibold tracking-[0.14em] uppercase text-zinc-600 mb-4">
-            Get in Touch
-          </span>
-
-          {sent ? (
-            <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center">
-              <div className="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                <span className="text-emerald-400 text-sm">✓</span>
+          {status === 'success' ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center justify-center py-10"
+            >
+              <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center mb-4 text-emerald-400">
+                <motion.span 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', damping: 10 }}
+                  className="text-3xl font-bold"
+                >
+                  ✓
+                </motion.span>
               </div>
-              <p className="text-[11px] font-medium text-zinc-300">Message sent!</p>
-              <p className="text-[9.5px] text-zinc-600">I'll get back to you soon.</p>
-            </div>
+              <h3 className="text-lg font-bold text-white font-display mb-1">Message Dispatched!</h3>
+              <p className="text-xs text-zinc-400 text-center font-mono">I'll respond within 24 hours.</p>
+            </motion.div>
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-2 flex-1">
-              <input
-                type="text"
-                placeholder="Name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-[7px] 
-                           px-3 py-2.5 text-[10px] text-zinc-300 placeholder-zinc-700
-                           focus:outline-none focus:border-white/[0.15] transition-all"
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-[7px] 
-                           px-3 py-2.5 text-[10px] text-zinc-300 placeholder-zinc-700
-                           focus:outline-none focus:border-white/[0.15] transition-all"
-              />
-              <textarea
-                rows={4}
-                placeholder="Message"
-                value={form.message}
-                onChange={(e) => setForm({ ...form, message: e.target.value })}
-                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-[7px] 
-                           px-3 py-2.5 text-[10px] text-zinc-300 placeholder-zinc-700
-                           focus:outline-none focus:border-white/[0.15] transition-all resize-none flex-1"
-              />
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Name Field */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder=" "
+                  value={formData.name}
+                  onFocus={() => setFocusedField('name')}
+                  onBlur={() => setFocusedField(null)}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="peer w-full bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-white placeholder-transparent focus:border-emerald-500/50 focus:bg-emerald-500/[0.01] focus:outline-none transition-all"
+                  required
+                  disabled={status === 'submitting'}
+                />
+                <label className="absolute left-4 top-3 text-xs text-zinc-500 font-mono pointer-events-none transition-all duration-300 peer-placeholder-shown:text-sm peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-emerald-400 peer-focus:bg-[#0d0d14] peer-focus:px-1.5 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-emerald-400 peer-[:not(:placeholder-shown)]:bg-[#0d0d14] peer-[:not(:placeholder-shown)]:px-1.5">
+                  Your name
+                </label>
+              </div>
+
+              {/* Email Field */}
+              <div className="relative">
+                <input
+                  type="email"
+                  placeholder=" "
+                  value={formData.email}
+                  onFocus={() => setFocusedField('email')}
+                  onBlur={() => setFocusedField(null)}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="peer w-full bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-white placeholder-transparent focus:border-emerald-500/50 focus:bg-emerald-500/[0.01] focus:outline-none transition-all"
+                  required
+                  disabled={status === 'submitting'}
+                />
+                <label className="absolute left-4 top-3 text-xs text-zinc-500 font-mono pointer-events-none transition-all duration-300 peer-placeholder-shown:text-sm peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-emerald-400 peer-focus:bg-[#0d0d14] peer-focus:px-1.5 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-emerald-400 peer-[:not(:placeholder-shown)]:bg-[#0d0d14] peer-[:not(:placeholder-shown)]:px-1.5">
+                  Email address
+                </label>
+              </div>
+
+              {/* Message Field */}
+              <div className="relative">
+                <textarea
+                  rows={4}
+                  placeholder=" "
+                  value={formData.message}
+                  onFocus={() => setFocusedField('message')}
+                  onBlur={() => setFocusedField(null)}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  className="peer w-full bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-white placeholder-transparent focus:border-emerald-500/50 focus:bg-emerald-500/[0.01] focus:outline-none transition-all resize-none"
+                  required
+                  disabled={status === 'submitting'}
+                />
+                <label className="absolute left-4 top-3 text-xs text-zinc-500 font-mono pointer-events-none transition-all duration-300 peer-placeholder-shown:text-sm peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-emerald-400 peer-focus:bg-[#0d0d14] peer-focus:px-1.5 peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:text-emerald-400 peer-[:not(:placeholder-shown)]:bg-[#0d0d14] peer-[:not(:placeholder-shown)]:px-1.5">
+                  Describe your project...
+                </label>
+              </div>
+
+              {/* Submit button */}
               <motion.button
                 type="submit"
+                disabled={status === 'submitting'}
                 whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full bg-zinc-100 hover:bg-white text-zinc-950 text-[9px] font-bold 
-                           uppercase tracking-[0.1em] py-2.5 rounded-[7px] transition-colors mt-1"
+                whileTap={{ scale: 0.99 }}
+                className="w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500 text-white font-semibold py-3 rounded-xl hover:shadow-lg hover:shadow-emerald-500/20 transition-all cursor-pointer font-mono text-sm relative overflow-hidden"
               >
-                Send Message
+                {status === 'submitting' ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    <span>TRANSMITTING...</span>
+                  </div>
+                ) : (
+                  <span>DISPATCH SIGNAL</span>
+                )}
               </motion.button>
             </form>
           )}
         </div>
-      </div>
-
-      {/* ── Col 3: Philosophy + Milestones ── */}
-      <div className="md:col-span-4 flex flex-col gap-3">
-
-        {/* Philosophy */}
-        <div className="bg-[#0e0e12] border border-white/[0.07] rounded-[10px] p-5 flex-1 flex flex-col justify-between">
-          <div>
-            <span className="text-[9px] font-semibold tracking-[0.14em] uppercase text-zinc-600">
-              Philosophy
-            </span>
-            <p className="text-[10.5px] text-zinc-400 font-light leading-[1.75] mt-3">
-              Driven by a genuine passion for clean software design patterns and system
-              architecture. Code isn't just logic — it's about engineering resilient
-              systems that solve real production bottlenecks while scaling elegantly
-              under load.
-            </p>
-          </div>
-          <span className="text-[10px] font-light italic text-zinc-600 text-right mt-4 block">
-            — Technical Focus
-          </span>
-        </div>
-
-        {/* Milestones */}
-        <div className="bg-[#0e0e12] border border-white/[0.07] rounded-[10px] p-5 flex-1">
-          <span className="text-[9px] font-semibold tracking-[0.14em] uppercase text-zinc-600">
-            Milestones
-          </span>
-
-          <div className="mt-4 flex flex-col">
-            {[
-              {
-                title: 'Information Technology Systems',
-                desc: 'Consistently building modular enterprise solutions and framework tooling.',
-              },
-              {
-                title: 'Open Source & Project Leadership',
-                desc: 'Managing sprints, orchestrating deployments, and repository pipelines.',
-              },
-            ].map((m, i) => (
-              <div
-                key={m.title}
-                className={`py-3.5 ${i === 0 ? 'border-b border-white/[0.05]' : ''}`}
-              >
-                <h4 className="text-[11px] font-bold tracking-[-0.01em] text-zinc-300 mb-1">
-                  {m.title}
-                </h4>
-                <p className="text-[9.5px] text-zinc-600 font-light leading-relaxed">
-                  {m.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-      </div>
+      </motion.div>
     </div>
   )
 }
