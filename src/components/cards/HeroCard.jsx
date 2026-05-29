@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion'
-import { info, stack } from "../../data/info";
+import { heroData } from "../../data/info";
 
 function HeroCard() {
   const ref = useRef(null)
@@ -56,28 +56,28 @@ function HeroCard() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
               <span className="text-xs font-semibold tracking-wide text-emerald-400 font-mono">
-                {info.statusBadge}
+                {heroData.statusBadge}
               </span>
             </div>
-            <span className="text-xs text-zinc-500 font-mono">{info.location}</span>
+            <span className="text-xs text-zinc-500 font-mono">{heroData.location}</span>
           </div>
 
           {/* Name */}
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6">
-            <span className="text-white">{info.firstName}</span>
+            <span className="text-white">{heroData.firstName}</span>
             <br />
-            <span className="text-white/90">{info.lastName}</span>
+            <span className="text-white/90">{heroData.lastName}</span>
           </h1>
 
             {/* Description */}
             <p className="text-sm text-zinc-400 max-w-xl mb-8 leading-relaxed">
-                {info.tagline}
+                {heroData.tagline}
             </p>
         </div>
 
         {/* Tech Stack Tags */}
         <div className="flex flex-wrap gap-2 mt-auto">
-          {stack.map((tech) => (
+          {heroData.stack.map((tech) => (
             <span
               key={tech}
               className="text-xs font-medium font-mono text-zinc-400 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-1.5 hover:border-emerald-500/40 hover:text-emerald-400 transition-all cursor-default"

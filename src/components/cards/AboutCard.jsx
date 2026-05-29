@@ -1,11 +1,11 @@
 import { useRef } from 'react'
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion'
-import { info } from '../../data/info'
+import { aboutData } from '../../data/info'
 
 function AboutCard() {
   const ref = useRef(null)
   
-  // Spotlight only (no tilt)
+  // Spotlight
   const spotlightX = useMotionValue(0)
   const spotlightY = useMotionValue(0)
   
@@ -34,7 +34,7 @@ function AboutCard() {
       onMouseLeave={handleMouseLeave}
       className="w-full h-full flex flex-col justify-between bg-[#0d0d14] border border-white/[0.04] rounded-2xl p-6 hover:border-emerald-500/20 transition-all duration-300 group cursor-default relative overflow-hidden"
     >
-      {/* Spotlight Layer - Follows your mouse */}
+      {/* Spotlight Layer */}
       <motion.div
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"
         style={{
@@ -51,19 +51,19 @@ function AboutCard() {
       {/* Content */}
       <div className="relative z-10">
         <span className="text-[10px] font-mono tracking-widest text-emerald-400 uppercase mb-4 block">
-            {info.about.focusArea}
+            About Me
         </span>
         
         <h2 className="text-2xl font-bold text-white mb-4 leading-tight">
-          {info.about.title}
+          {aboutData.title}
         </h2>
 
         <p className="text-zinc-300 text-sm leading-relaxed mb-4">
-          {info.about.description1}
+          {aboutData.description1}
         </p>
 
         <p className="text-zinc-400 text-xs leading-relaxed">
-          {info.about.description2}
+          {aboutData.description2}
         </p>
       </div>
     </motion.div>
