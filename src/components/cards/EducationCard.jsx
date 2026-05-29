@@ -95,7 +95,7 @@ function EducationCard() {
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <i className={`${edu.icon} text-sm text-emerald-400 mr-1`} />
-                  <h3 className="text-sm font-semibold text-white group-hover:text-emerald-400/90 transition-colors">
+                  <h3 className="text-sm font-semibold text-white">
                     {edu.institution}
                   </h3>
                 </div>

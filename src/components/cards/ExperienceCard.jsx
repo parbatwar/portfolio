@@ -1,61 +1,32 @@
-// components/cards/ExperienceCard.jsx
+// components/cards/ExperienceCard.jsx - Simplified, no 3D tilt
 
 import { useRef } from 'react'
-import { motion, useMotionValue, useTransform, useMotionTemplate } from 'framer-motion'
+import { motion, useMotionValue, useMotionTemplate } from 'framer-motion'
+import { experienceData } from '../../data/info'
 
 function ExperienceCard() {
   const ref = useRef(null)
-
-  // 3D tilt
-  const tiltX = useMotionValue(0)
-  const tiltY = useMotionValue(0)
-  const rotateX = useTransform(tiltY, [-0.5, 0.5], [5, -5])
-  const rotateY = useTransform(tiltX, [-0.5, 0.5], [-5, 5])
   
   // Spotlight
-  const spotlightX = useMotionValue(0)
-  const spotlightY = useMotionValue(0)
+  const spotlightX = useMotionValue(-999)
+  const spotlightY = useMotionValue(-999)
   
   const handleMouseMove = (e) => {
-    if (!ref.current) return
-    const rect = ref.current.getBoundingClientRect()
-    tiltX.set((e.clientX - rect.left) / rect.width - 0.5)
-    tiltY.set((e.clientY - rect.top) / rect.height - 0.5)
-    spotlightX.set(e.clientX - rect.left)
-    spotlightY.set(e.clientY - rect.top)
-  }
-
-  const handleMouseLeave = () => {
-    tiltX.set(0)
-    tiltY.set(0)
-  }
-
-  const experience = {
-    role: 'Python Backend Developer Intern',
-    company: 'Tech Solutions Ltd.',
-    period: '2025 – Present',
-    details: [
-      'Developed and optimized backend server modules using Python, FastAPI, and Django, lowering server response time by 25%.',
-      'Created automated ETL scraping scripts to fetch and ingest large financial datasets into PostgreSQL databases.',
-      'Designed and executed complex SQL queries and set indexes, improving data fetch speeds for user-facing API routes.',
-      'Managed source control and repository versioning using Git, and participated in active code reviews.'
-    ],
-    tech: ['Python', 'Django', 'FastAPI', 'PostgreSQL', 'SQL', 'Git']
+    const rect = ref.current?.getBoundingClientRect()
+    if (rect) {
+      spotlightX.set(e.clientX - rect.left)
+      spotlightY.set(e.clientY - rect.top)
+    }
   }
 
   return (
     <motion.div
       ref={ref}
       onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX,
-        rotateY,
-        transformStyle: 'preserve-3d',
-      }}
-      className="w-full h-full flex flex-col justify-between bg-[#0d0d14] border border-white/[0.04] rounded-2xl p-6 hover:border-emerald-500/20 transition-all duration-300 glow-card group cursor-default"
+      onMouseLeave={() => { spotlightX.set(-999); spotlightY.set(-999) }}
+      className="w-full h-full flex flex-col bg-[#0d0d14] border border-white/[0.04] rounded-2xl p-6 hover:border-emerald-500/20 transition-all duration-300 group cursor-default relative overflow-hidden"
     >
-      {/* Spotlight */}
+      {/* Spotlight Layer */}
       <motion.div
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition duration-300"
         style={{
@@ -69,39 +40,36 @@ function ExperienceCard() {
         }}
       />
 
-      <div style={{ transform: 'translateZ(10px)' }} className="w-full">
+      {/* Content */}
+      <div className="relative z-10 flex flex-col h-full">
+        {/* Header */}
         <span className="text-[10px] font-mono tracking-widest text-emerald-400 uppercase mb-4 block">
-          // Professional Experience
+            Professional Experience
         </span>
 
+        {/* Experience Card */}
         <div className="border border-white/[0.04] bg-white/[0.01] rounded-xl p-4">
           {/* Header */}
           <div className="flex justify-between items-start gap-2 border-b border-white/[0.04] pb-3 mb-3">
             <div>
-              <h3 className="text-sm font-bold text-white font-display">{experience.role}</h3>
-              <p className="text-xs text-emerald-400/80 font-mono mt-0.5">{experience.company}</p>
+              <h3 className="text-sm font-bold text-white">{experienceData.role}</h3>
+              <p className="text-xs text-emerald-400/80 font-mono mt-0.5">{experienceData.company}</p>
             </div>
-            <span className="text-[10px] text-zinc-500 font-mono bg-white/[0.02] border border-white/[0.04] px-1.5 py-0.5 rounded whitespace-nowrap">{experience.period}</span>
+            <span className="text-[10px] text-zinc-500 font-mono bg-white/[0.02] border border-white/[0.04] px-1.5 py-0.5 rounded whitespace-nowrap">
+              {experienceData.period}
+            </span>
           </div>
 
           {/* Details list */}
           <ul className="space-y-2">
-            {experience.details.map((detail, index) => (
+            {experienceData.details.map((detail, index) => (
               <li key={index} className="text-xs text-zinc-400 flex items-start gap-2 leading-relaxed">
                 <span className="text-emerald-400 mt-0.5 shrink-0">▹</span>
                 <span>{detail}</span>
               </li>
             ))}
           </ul>
-
-          {/* Tech pills */}
-          <div className="flex flex-wrap gap-1.5 mt-4 pt-3 border-t border-white/[0.04]">
-            {experience.tech.map((t) => (
-              <span key={t} className="text-[9px] font-mono text-zinc-400 bg-white/[0.04] border border-white/[0.04] rounded px-2 py-0.5">
-                {t}
-              </span>
-            ))}
-          </div>
+          
         </div>
       </div>
     </motion.div>

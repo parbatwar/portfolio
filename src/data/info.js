@@ -6,7 +6,7 @@ export const heroData = {
     statusBadge: "DEV · DATA",
     location: "Lalitpur, Nepal",
     email: "parbatwar@gmail.com",
-    tagline: "A full-stack developer and data enthusiast focused on architecting efficient backend systems, automated pipelines, and clean user interfaces.",
+    tagline: "A software developer and data enthusiast focused on architecting efficient backend systems, automated pipelines, and clean user interfaces.",
 
     stack: [
         "Python", 
@@ -94,3 +94,16 @@ export const educationData = [
     icon: 'fas fa-book-open'
   }
 ]
+
+
+// EXPERIENCE CARD DATA
+export const experienceData = {
+    role: 'Backend Developer Intern',
+    company: 'BrahmaByte Lab Pvt. Ltd.',
+    period: 'Sep 2025 – Dec 2025',
+    details: [
+        'Built and maintained RESTful APIs using FastAPI for an AI-powered customer service SaaS platform.',
+        'Developed multiple third-party integrations handling OAuth authentication, message services, and data storage.',
+        'Focused on clean code, scalability, and maintainability following company coding standards.',
+    ],
+}
