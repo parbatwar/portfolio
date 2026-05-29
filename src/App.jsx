@@ -4,6 +4,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import ProfessionalSide from './pages/ProfessionalSide'
 import PersonalSide from './pages/PersonalSide'
+import ConstructionPage from './pages/ConstructionPage'
 
 function App() {
   const location = useLocation()
@@ -14,7 +15,8 @@ function App() {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<ProfessionalSide />} />
-          <Route path="/personal" element={<PersonalSide />} />
+          {/* <Route path="/personal" element={<PersonalSide />} /> */}
+          <Route path="personal" element={<ConstructionPage />} />
         </Routes>
       </AnimatePresence>
     </div>

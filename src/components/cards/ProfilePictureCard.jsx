@@ -10,7 +10,7 @@ function ProfilePictureCard() {
     >
       {/* Image */}
       <img
-        src="/bhattay_dai.jpg"
+        src="/Parbat.jpg"
         alt="Parbat Sunuwar"
         className="w-full h-full object-cover object-center absolute inset-0
                    brightness-75 group-hover:brightness-95

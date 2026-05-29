@@ -107,3 +107,16 @@ export const experienceData = {
         'Focused on clean code, scalability, and maintainability following company coding standards.',
     ],
 }
+
+
+// SOCIAL CARD DATA
+export const socialsData = {
+  github: "https://github.com/parbatwar",
+  linkedin: "https://www.linkedin.com/in/parbatwar/",
+  facebook: "https://www.facebook.com/parbatsunuwar05/",
+  email: "parbatwar@gmail.com",
+  youtube: "https://www.youtube.com/@maachaproductions",
+  instagramPersonal: "https://www.instagram.com/parbat_war/",
+  instagramBrand: "https://www.instagram.com/bythehill_/",
+  soundcloud: "https://soundcloud.com/warbatmusic"
+}
