@@ -8,9 +8,15 @@ export const info = {
     email: "parbatwar@gmail.com",
     
     // Tagline/Description
-    tagline: "I've always loved making things. Programming gave that feeling a home, and the deeper I went into systems and data, the more I realized this rabbit hole never really ends.",
-    highlight: " That's the best part.",
+    tagline: "A full-stack developer and data enthusiast focused on architecting efficient backend systems, automated pipelines, and clean user interfaces.",
 
+    // About Section (for AboutCard)
+    about: {
+        focusArea: "About Me",
+        title: "Engineering robust apps and data systems.",
+        description1: "Based in Kathmandu, Nepal, I’m a developer with a heavy focus on backend architecture and data engineering. I love designing efficient systems making sure the logic underneath is just as solid as the user experience on top.",
+        description2: "I'm a massive data enthusiast, and there is nothing more satisfying than writing clean code that structures and processes complex data efficiently.",
+    },
     
     // Social Links
     socials: {
@@ -29,6 +35,11 @@ export const stack = [
     "ETL Pipelines", 
     "SQL"
 ]
+
+
+
+
+
 
 export const projects = [
     {

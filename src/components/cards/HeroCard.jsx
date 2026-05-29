@@ -72,8 +72,6 @@ function HeroCard() {
             {/* Description */}
             <p className="text-sm text-zinc-400 max-w-xl mb-8 leading-relaxed">
                 {info.tagline}
-                <br />
-                {info.highlight}
             </p>
         </div>
 
