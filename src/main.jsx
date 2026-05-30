@@ -4,7 +4,9 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './index.css'
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const root = ReactDOM.createRoot(document.getElementById('root'))
+
+root.render(
   <React.StrictMode>
     <BrowserRouter>
       <App />
@@ -12,4 +14,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>
 )
 
-document.getElementById('initial-loader')?.remove()
+// remove loader after first paint
+requestAnimationFrame(() => {
+  setTimeout(() => {
+    document.getElementById('initial-loader')?.remove()
+  }, 150)
+})
