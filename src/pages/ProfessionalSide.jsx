@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
 import NavCard from '../components/cards/NavCard'
 import HeroCard from '../components/cards/HeroCard'
-import AboutCard from '../components/cards/AboutCard' 
 import ProfilePictureCard from '../components/cards/ProfilePictureCard'
-import TechStackCard from '../components/cards/TechStackCard'
-import EducationCard from '../components/cards/EducationCard'
-import ExperienceCard from '../components/cards/ExperienceCard'
-import FeaturedProjects from '../components/cards/FeaturedProjects'
-import SocialsCard from '../components/cards/SocialsCard'
-import ContactForm from '../components/cards/ContactForm'
 import { socialsData } from '../data/info'
+
+const AboutCard = lazy(() => import('../components/cards/AboutCard'))
+const TechStackCard = lazy(() => import('../components/cards/TechStackCard'))
+const EducationCard = lazy(() => import('../components/cards/EducationCard'))
+const ExperienceCard = lazy(() => import('../components/cards/ExperienceCard'))
+const FeaturedProjects = lazy(() => import('../components/cards/FeaturedProjects'))
+const SocialsCard = lazy(() => import('../components/cards/SocialsCard'))
+const ContactForm = lazy(() => import('../components/cards/ContactForm'))
 
 const SECTIONS = [
   { id: 'intro',   label: 'Overview'  },
@@ -29,7 +30,7 @@ const cardVariant = {
     transition: {
       type: 'spring',
       stiffness: 45,
-      damping: 14,    
+      damping: 14,
       mass: 0.8,
     },
   },
@@ -38,7 +39,7 @@ const cardVariant = {
 function AnimatedCard({ className, children }) {
   return (
     <motion.div
-      className={`${className} transform-gpu`} 
+      className={`${className} transform-gpu`}
       variants={cardVariant}
       initial="hidden"
       whileInView="visible"
@@ -46,6 +47,13 @@ function AnimatedCard({ className, children }) {
     >
       {children}
     </motion.div>
+  )
+}
+
+// Minimal placeholder while lazy components load
+function CardSkeleton({ className }) {
+  return (
+    <div className={`${className} rounded-2xl bg-[#0d0d14] border border-white/[0.04] animate-pulse min-h-[200px]`} />
   )
 }
 
@@ -78,7 +86,7 @@ function ProfessionalSide() {
       </div>
 
       {/* Center spotlight */}
-      <div 
+      <div
         className="pointer-events-none fixed inset-0 z-0 opacity-40 mix-blend-screen"
         style={{
           background: 'radial-gradient(600px circle at 50% 25%, rgba(16,185,129,0.04) 0%, transparent 100%)'
@@ -118,14 +126,14 @@ function ProfessionalSide() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 md:px-6 py-8">
+      <main className="relative z-10 max-w-6xl mx-auto px-4 md:px-6 py-8">
         <div className="flex justify-center items-center mb-14">
           <NavCard />
         </div>
 
         <div className="space-y-6">
 
-          {/* Section 1 — Intro */}
+          {/* Section 1 — Intro (eager, above the fold) */}
           <div id="intro" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28">
             <AnimatedCard className="md:col-span-2">
               <HeroCard />
@@ -135,38 +143,60 @@ function ProfessionalSide() {
             </AnimatedCard>
           </div>
 
-          {/* Section 2 — About */}
-          <div id="about" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28">
-            <AnimatedCard className="md:col-span-1">
-              <AboutCard />
-            </AnimatedCard>
-            <AnimatedCard className="md:col-span-1">
-              <TechStackCard />
-            </AnimatedCard>
-            <AnimatedCard className="md:col-span-2 lg:col-span-1">
-              <EducationCard />
-            </AnimatedCard>
-          </div>
+          {/* Section 2 — About (lazy) */}
+          <Suspense fallback={
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <CardSkeleton className="md:col-span-1" />
+              <CardSkeleton className="md:col-span-1" />
+              <CardSkeleton className="md:col-span-2 lg:col-span-1" />
+            </div>
+          }>
+            <div id="about" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28">
+              <AnimatedCard className="md:col-span-1">
+                <AboutCard />
+              </AnimatedCard>
+              <AnimatedCard className="md:col-span-1">
+                <TechStackCard />
+              </AnimatedCard>
+              <AnimatedCard className="md:col-span-2 lg:col-span-1">
+                <EducationCard />
+              </AnimatedCard>
+            </div>
+          </Suspense>
 
-          {/* Section 3 — Work */}
-          <div id="work" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28">
-            <AnimatedCard className="md:col-span-2 lg:col-span-1">
-              <ExperienceCard />
-            </AnimatedCard>
-            <AnimatedCard className="md:col-span-2">
-              <FeaturedProjects />
-            </AnimatedCard>
-          </div>
+          {/* Section 3 — Work (lazy) */}
+          <Suspense fallback={
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <CardSkeleton className="md:col-span-2 lg:col-span-1" />
+              <CardSkeleton className="md:col-span-2" />
+            </div>
+          }>
+            <div id="work" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28">
+              <AnimatedCard className="md:col-span-2 lg:col-span-1">
+                <ExperienceCard />
+              </AnimatedCard>
+              <AnimatedCard className="md:col-span-2">
+                <FeaturedProjects />
+              </AnimatedCard>
+            </div>
+          </Suspense>
 
-          {/* Section 4 — Contact */}
-          <div id="contact" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28">
-            <AnimatedCard className="md:col-span-2">
-              <ContactForm />
-            </AnimatedCard>
-            <AnimatedCard className="md:col-span-2 lg:col-span-1">
-              <SocialsCard />
-            </AnimatedCard>
-          </div>
+          {/* Section 4 — Contact (lazy) */}
+          <Suspense fallback={
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <CardSkeleton className="md:col-span-2" />
+              <CardSkeleton className="md:col-span-2 lg:col-span-1" />
+            </div>
+          }>
+            <div id="contact" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28">
+              <AnimatedCard className="md:col-span-2">
+                <ContactForm />
+              </AnimatedCard>
+              <AnimatedCard className="md:col-span-2 lg:col-span-1">
+                <SocialsCard />
+              </AnimatedCard>
+            </div>
+          </Suspense>
 
         </div>
 
@@ -196,7 +226,7 @@ function ProfessionalSide() {
             </div>
           </div>
         </footer>
-      </div>
+      </main>
     </div>
   )
 }
