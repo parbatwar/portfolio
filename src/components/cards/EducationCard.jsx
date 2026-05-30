@@ -94,7 +94,6 @@ function EducationCard() {
               {/* Institution Info */}
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <edu.icon className="text-sm text-emerald-400" />
                   <h3 className="text-sm font-semibold text-white">
                     {edu.institution}
                   </h3>

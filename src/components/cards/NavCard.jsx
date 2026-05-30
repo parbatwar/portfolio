@@ -16,7 +16,7 @@ function NavCard() {
       className="inline-flex items-center justify-between gap-5 rounded-full bg-[#0d0d14]/75 backdrop-blur-xl border border-white/[0.06] px-4 py-2 z-50 shadow-lg shadow-black/20"
       style={{ width: 'auto', margin: '0 auto' }}
     >
-      {/* Nav Links with layoutId indicators - removed the P logo */}
+      {/* Nav Links with layoutId indicators */}
       <div className="flex items-center gap-1 relative">
         <Link 
           to="/"
