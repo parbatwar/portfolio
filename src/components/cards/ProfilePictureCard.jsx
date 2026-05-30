@@ -10,8 +10,10 @@ function ProfilePictureCard() {
     >
       {/* Image */}
       <img
-        src="/Parbat.jpg"
+        src="/Parbat.webp"
         alt="Parbat Sunuwar"
+        fetchPriority="high"
+        loading="eager"
         className="w-full h-full object-cover object-center absolute inset-0
                    brightness-75 group-hover:brightness-95
                    transition-all duration-300 ease-out"

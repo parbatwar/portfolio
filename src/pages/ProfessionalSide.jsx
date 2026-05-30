@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { motion, useMotionValue, useMotionTemplate } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 import NavCard from '../components/cards/NavCard'
 import HeroCard from '../components/cards/HeroCard'
@@ -20,7 +20,6 @@ const SECTIONS = [
   { id: 'contact', label: 'Contact'   },
 ]
 
-// ─── Optimized Card Animation Variant ──────────────────────────────────────────
 const cardVariant = {
   hidden: { opacity: 0, y: 16, scale: 0.98 },
   visible: {
@@ -39,7 +38,7 @@ const cardVariant = {
 function AnimatedCard({ className, children }) {
   return (
     <motion.div
-      className={`${className} transform-gpu will-change-transform`} 
+      className={`${className} transform-gpu`} 
       variants={cardVariant}
       initial="hidden"
       whileInView="visible"
@@ -50,7 +49,6 @@ function AnimatedCard({ className, children }) {
   )
 }
 
-// ─── Main Component ──────────────────────────────────────────────────────────
 function ProfessionalSide() {
   const [activeSection, setActiveSection] = useState('intro')
 
@@ -73,13 +71,13 @@ function ProfessionalSide() {
   return (
     <div className="relative min-h-screen bg-[#050508] overflow-hidden selection:bg-emerald-500/25 text-white transform-gpu">
 
-      {/* Soft corner glows - fully static */}
+      {/* Soft corner glows */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute w-[500px] h-[500px] rounded-full bg-emerald-500/5 blur-[140px] -top-48 -left-48" />
         <div className="absolute w-[400px] h-[400px] rounded-full bg-indigo-500/5 blur-[120px] bottom-0 right-0" />
       </div>
 
-      {/* Gentle center spotlight - converted to an elegant static design layer */}
+      {/* Center spotlight */}
       <div 
         className="pointer-events-none fixed inset-0 z-0 opacity-40 mix-blend-screen"
         style={{
@@ -128,10 +126,7 @@ function ProfessionalSide() {
         <div className="space-y-6">
 
           {/* Section 1 — Intro */}
-          <div
-            id="intro"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28"
-          >
+          <div id="intro" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28">
             <AnimatedCard className="md:col-span-2">
               <HeroCard />
             </AnimatedCard>
@@ -141,10 +136,7 @@ function ProfessionalSide() {
           </div>
 
           {/* Section 2 — About */}
-          <div
-            id="about"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28"
-          >
+          <div id="about" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28">
             <AnimatedCard className="md:col-span-1">
               <AboutCard />
             </AnimatedCard>
@@ -157,10 +149,7 @@ function ProfessionalSide() {
           </div>
 
           {/* Section 3 — Work */}
-          <div
-            id="work"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28"
-          >
+          <div id="work" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28">
             <AnimatedCard className="md:col-span-2 lg:col-span-1">
               <ExperienceCard />
             </AnimatedCard>
@@ -170,10 +159,7 @@ function ProfessionalSide() {
           </div>
 
           {/* Section 4 — Contact */}
-          <div
-            id="contact"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28"
-          >
+          <div id="contact" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch scroll-mt-28">
             <AnimatedCard className="md:col-span-2">
               <ContactForm />
             </AnimatedCard>
