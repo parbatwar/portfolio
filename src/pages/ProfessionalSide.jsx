@@ -69,7 +69,7 @@ function ProfessionalSide() {
   }, [])
 
   return (
-    <div className="relative min-h-screen bg-[#050508] overflow-hidden selection:bg-emerald-500/25 text-white transform-gpu">
+    <div className="relative min-h-screen bg-[#050508] selection:bg-emerald-500/25 text-white">
 
       {/* Soft corner glows */}
       <div className="fixed inset-0 z-0 pointer-events-none">
