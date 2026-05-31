@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
-import NavCard from '../components/cards/NavCard'
+// import NavCard from '../components/cards/NavCard'
 import HeroCard from '../components/cards/HeroCard'
 import ProfilePictureCard from '../components/cards/ProfilePictureCard'
 import { socialsData } from '../data/info'
@@ -127,9 +127,9 @@ function ProfessionalSide() {
 
       {/* Content */}
       <main className="relative z-10 max-w-6xl mx-auto px-4 md:px-6 py-8">
-        <div className="flex justify-center items-center mb-14">
+        {/* <div className="flex justify-center items-center mb-14">
           <NavCard />
-        </div>
+        </div> */}
 
         <div className="space-y-6">
 
