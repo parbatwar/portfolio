@@ -19,6 +19,7 @@ function App() {
   )
 }
 
+// a wrapper component to apply the same animation to all pages
 function PageWrapper({ children }) {
   return (
     <motion.div
