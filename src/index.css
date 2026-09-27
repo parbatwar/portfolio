@@ -8,6 +8,9 @@
 
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+  scrollbar-width: auto;
+  scrollbar-color: #46534f #050508;
 }
 
 body {
@@ -21,18 +24,25 @@ body {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: #46534f;
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: #648578;
+}
+
+.grid > * { min-width: 0; }
+.repo-viewport { scroll-behavior: auto; scrollbar-width: thin; scrollbar-color: #46534f transparent; }
+a:focus-visible, button:focus-visible { outline: 2px solid #34d399; outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
 
 /* Dotted grid pattern */

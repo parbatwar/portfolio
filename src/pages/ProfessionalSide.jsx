@@ -61,19 +61,25 @@ function ProfessionalSide() {
   const [activeSection, setActiveSection] = useState('intro')
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) setActiveSection(entry.target.id)
-        })
-      },
-      { root: null, rootMargin: '-30% 0px -60% 0px', threshold: 0 }
-    )
-    SECTIONS.forEach(({ id }) => {
-      const el = document.getElementById(id)
-      if (el) observer.observe(el)
-    })
-    return () => observer.disconnect()
+    const update = () => {
+      let current = 'intro'
+      for (const { id } of SECTIONS) {
+        const section = document.getElementById(id)
+        if (section && section.getBoundingClientRect().top <= window.innerHeight * 0.35) current = id
+      }
+      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4) current = 'contact'
+      setActiveSection(current)
+    }
+    const observer = new ResizeObserver(update)
+    observer.observe(document.body)
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    update()
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
   }, [])
 
   return (
@@ -98,7 +104,7 @@ function ProfessionalSide() {
         {SECTIONS.map(({ id, label }) => {
           const isActive = activeSection === id
           return (
-            <a key={id} href={`#${id}`} className="flex items-center gap-3 group relative cursor-pointer">
+            <a key={id} href={`#${id}`} aria-label={label} aria-current={isActive ? 'location' : undefined} className="flex min-h-8 items-center gap-3 group relative cursor-pointer">
               <span
                 className={`font-mono text-[9px] tracking-wider uppercase px-2 py-0.5 bg-black/80 border border-white/[0.06] rounded backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none translate-x-2 group-hover:translate-x-0 ${
                   isActive ? 'text-emerald-400 border-emerald-500/20' : 'text-zinc-500'
@@ -126,7 +132,7 @@ function ProfessionalSide() {
       </div>
 
       {/* Content */}
-      <main className="relative z-10 max-w-6xl mx-auto px-4 md:px-6 py-8">
+      <main className="relative z-10 max-w-6xl mx-auto px-4 md:pl-6 md:pr-16 py-8">
         {/* <div className="flex justify-center items-center mb-14">
           <NavCard />
         </div> */}

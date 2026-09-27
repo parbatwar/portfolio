@@ -20,6 +20,7 @@ function NavCard() {
       <div className="flex items-center gap-1 relative">
         <Link 
           to="/"
+          aria-current={isWorkActive ? 'page' : undefined}
           className={`relative px-5 py-1.5 text-xs font-semibold font-mono rounded-full tracking-wide transition-colors duration-300 ${
             isWorkActive ? 'text-white' : 'text-zinc-500 hover:text-zinc-200'
           }`}
@@ -31,10 +32,11 @@ function NavCard() {
               transition={{ type: 'spring', stiffness: 380, damping: 30 }}
             />
           )}
-          WORK
+          Professional
         </Link>
         <Link 
           to="/personal"
+          aria-current={isPersonalActive ? 'page' : undefined}
           className={`relative px-5 py-1.5 text-xs font-semibold font-mono rounded-full tracking-wide transition-colors duration-300 ${
             isPersonalActive ? 'text-white' : 'text-zinc-500 hover:text-zinc-200'
           }`}
@@ -46,7 +48,7 @@ function NavCard() {
               transition={{ type: 'spring', stiffness: 380, damping: 30 }}
             />
           )}
-          LIFE
+          Personal
         </Link>
       </div>
     </motion.nav>
