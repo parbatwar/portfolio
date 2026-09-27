@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { socialsData } from '../../data/info'
-import { fetchStarredRepos, fetchReadme } from '../../data/github'
+import { fetchStarredRepos } from '../../data/github'
 
-const username = new URL(socialsData.github).pathname.split('/').filter(Boolean)[0]
-const cacheKey = `starred-repos-v1:${username}`
+const cacheKey = 'starred-repos-v3'
+const CACHE_DURATION = 5 * 60 * 1000
 
 export default function FeaturedProjects() {
   const [repos, setRepos] = useState([])
@@ -11,86 +11,242 @@ export default function FeaturedProjects() {
   const [error, setError] = useState('')
   const [paused, setPaused] = useState(false)
   const [attempt, setAttempt] = useState(0)
-  const [previews, setPreviews] = useState({})
+
   const viewport = useRef(null)
 
   useEffect(() => {
     const controller = new AbortController()
-    async function refresh() {
-      try {
-        const cached = JSON.parse(sessionStorage.getItem(cacheKey) || 'null')
-        if (cached && Date.now() - cached.time < 300000) {
-          setRepos(cached.repos)
-          setLoading(false)
-          return
+
+    async function refresh(useCache = true) {
+      if (useCache) {
+        try {
+          const cached = JSON.parse(
+            sessionStorage.getItem(cacheKey) || 'null'
+          )
+
+          if (
+            cached &&
+            Date.now() - cached.time < CACHE_DURATION
+          ) {
+            setRepos(cached.repos)
+            setLoading(false)
+            return
+          }
+        } catch {
+          // Cache is optional
         }
-      } catch { /* Storage is optional. */ }
+      }
+
       try {
-        const next = await fetchStarredRepos(username, controller.signal)
+        const next = await fetchStarredRepos(
+          controller.signal
+        )
+
         setRepos(next)
         setError('')
-        try { sessionStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), repos: next })) } catch { /* Optional cache. */ }
+
+        try {
+          sessionStorage.setItem(
+            cacheKey,
+            JSON.stringify({
+              time: Date.now(),
+              repos: next,
+            })
+          )
+        } catch {
+          // Cache is optional
+        }
       } catch (err) {
-        if (!controller.signal.aborted) setError(err.message)
+        if (!controller.signal.aborted) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : 'Could not load repositories.'
+          )
+        }
       } finally {
-        if (!controller.signal.aborted) setLoading(false)
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
       }
     }
-    refresh()
-    const timer = window.setInterval(refresh, 300000)
-    return () => { controller.abort(); window.clearInterval(timer) }
+
+    refresh(true)
+
+    const timer = window.setInterval(() => {
+      refresh(false)
+    }, CACHE_DURATION)
+
+    return () => {
+      controller.abort()
+      window.clearInterval(timer)
+    }
   }, [attempt])
 
   useEffect(() => {
-    const controller = new AbortController()
-    let index = 0
-    async function worker() {
-      while (index < repos.length && !controller.signal.aborted) {
-        const repo = repos[index++]
-        try {
-          const text = await fetchReadme(repo, controller.signal)
-          if (!controller.signal.aborted) setPreviews(previous => ({ ...previous, [repo.id]: text }))
-        } catch {
-          if (!controller.signal.aborted) setPreviews(previous => ({ ...previous, [repo.id]: null }))
-        }
-      }
-    }
-    // Load cards immediately; fetch at most three README previews at once.
-    void Promise.all([worker(), worker(), worker()])
-    return () => controller.abort()
-  }, [repos])
-
-  useEffect(() => {
     const el = viewport.current
+
     if (!el || !repos.length) return
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
-    let frame, last = 0, direction = 1, restUntil = 0, position = el.scrollLeft
+
+    const reducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    )
+
+    let frame
+    let last = 0
+    let direction = 1
+    let restUntil = 0
+    let position = el.scrollLeft
     let interacting = false
-    const enter = () => { interacting = true }
-    const leave = () => { interacting = false; restUntil = performance.now() + 1500 }
-    const wheel = () => { restUntil = performance.now() + 4000 }
+
+    const startInteraction = () => {
+      interacting = true
+    }
+
+    const stopInteraction = () => {
+      interacting = false
+      restUntil = performance.now() + 1500
+    }
+
+    const userScroll = () => {
+      position = el.scrollLeft
+      restUntil = performance.now() + 4000
+    }
+
+    const syncPosition = () => {
+      position = el.scrollLeft
+    }
+
     const tick = (time) => {
-      const delta = last ? Math.min(time - last, 50) : 0
+      const delta = last
+        ? Math.min(time - last, 50)
+        : 0
+
       last = time
-      const max = el.scrollWidth - el.clientWidth
-      if (!paused && !interacting && !reduced.matches && !el.contains(document.activeElement) && time > restUntil && max > 0) {
-        position = Math.max(0, Math.min(max, position + direction * delta * 0.025))
+
+      const max =
+        el.scrollWidth - el.clientWidth
+
+      const shouldMove =
+        !document.hidden &&
+        !paused &&
+        !interacting &&
+        !reducedMotion.matches &&
+        !el.contains(document.activeElement) &&
+        time > restUntil &&
+        max > 0
+
+      if (shouldMove) {
+        position += direction * delta * 0.025
+
+        position = Math.max(
+          0,
+          Math.min(max, position)
+        )
+
         el.scrollLeft = position
-        if (position >= max || (direction < 0 && position <= 0)) { direction *= -1; restUntil = time + 2000 }
-      } else { position = el.scrollLeft }
+
+        if (
+          position >= max ||
+          (direction < 0 && position <= 0)
+        ) {
+          direction *= -1
+          restUntil = time + 2000
+        }
+      } else {
+        position = el.scrollLeft
+      }
+
       frame = requestAnimationFrame(tick)
     }
-    el.addEventListener('pointerenter', enter)
-    el.addEventListener('pointerleave', leave)
-    el.addEventListener('touchstart', wheel, { passive: true })
-    el.addEventListener('wheel', wheel, { passive: true })
+
+    el.addEventListener(
+      'pointerenter',
+      startInteraction
+    )
+
+    el.addEventListener(
+      'pointerleave',
+      stopInteraction
+    )
+
+    el.addEventListener(
+      'pointerdown',
+      startInteraction
+    )
+
+    el.addEventListener(
+      'pointerup',
+      stopInteraction
+    )
+
+    el.addEventListener(
+      'pointercancel',
+      stopInteraction
+    )
+
+    el.addEventListener(
+      'touchstart',
+      userScroll,
+      { passive: true }
+    )
+
+    el.addEventListener(
+      'wheel',
+      userScroll,
+      { passive: true }
+    )
+
+    el.addEventListener(
+      'scroll',
+      syncPosition,
+      { passive: true }
+    )
+
     frame = requestAnimationFrame(tick)
+
     return () => {
       cancelAnimationFrame(frame)
-      el.removeEventListener('pointerenter', enter)
-      el.removeEventListener('pointerleave', leave)
-      el.removeEventListener('touchstart', wheel)
-      el.removeEventListener('wheel', wheel)
+
+      el.removeEventListener(
+        'pointerenter',
+        startInteraction
+      )
+
+      el.removeEventListener(
+        'pointerleave',
+        stopInteraction
+      )
+
+      el.removeEventListener(
+        'pointerdown',
+        startInteraction
+      )
+
+      el.removeEventListener(
+        'pointerup',
+        stopInteraction
+      )
+
+      el.removeEventListener(
+        'pointercancel',
+        stopInteraction
+      )
+
+      el.removeEventListener(
+        'touchstart',
+        userScroll
+      )
+
+      el.removeEventListener(
+        'wheel',
+        userScroll
+      )
+
+      el.removeEventListener(
+        'scroll',
+        syncPosition
+      )
     }
   }, [repos, paused])
 
@@ -98,26 +254,138 @@ export default function FeaturedProjects() {
     <section className="w-full min-w-0 h-full bg-[#0d0d14] border border-white/[0.04] rounded-2xl p-6 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
-          <span className="text-[10px] font-mono tracking-widest text-emerald-400 uppercase">Projects</span>
-          <h2 className="text-2xl font-bold text-white">Starred repositories</h2>
-          <p className="mt-1 text-xs text-zinc-500">My GitHub picks · automatically updated</p>
+          <span className="text-[10px] font-mono tracking-widest text-emerald-400 uppercase">
+            Projects
+          </span>
+
+          <h2 className="text-2xl font-bold text-white">
+            Starred repositories
+          </h2>
+
+          <p className="mt-1 text-xs text-zinc-500">
+            My GitHub picks · latest activity first
+          </p>
         </div>
-        <button type="button" onClick={() => setPaused(!paused)} aria-pressed={paused} className="text-xs text-zinc-300 border border-white/10 rounded-full px-3 py-2 hover:text-emerald-400">{paused ? 'Resume motion' : 'Pause motion'}</button>
+
+        <button
+          type="button"
+          onClick={() =>
+            setPaused((current) => !current)
+          }
+          aria-pressed={paused}
+          className="text-xs text-zinc-300 border border-white/10 rounded-full px-3 py-2 hover:text-emerald-400 transition-colors"
+        >
+          {paused
+            ? 'Resume motion'
+            : 'Pause motion'}
+        </button>
       </div>
-      {loading && <p role="status" className="text-sm text-zinc-400 py-12">Loading repositories…</p>}
-      {error && <div role="status" className="text-sm text-zinc-400 mb-4">{error} <button className="text-emerald-400 underline" onClick={() => setAttempt(attempt + 1)}>Retry</button></div>}
-      {!loading && !error && !repos.length && <p className="text-sm text-zinc-400 py-12">No starred repositories yet.</p>}
-      <div ref={viewport} className="repo-viewport flex gap-4 overflow-x-auto pb-4" aria-label="Starred GitHub repositories" tabIndex={0}>
-        {repos.map(repo => (
-          <a key={repo.id} href={repo.html_url} target="_blank" rel="noopener noreferrer" className="flex flex-col shrink-0 w-[min(270px,85vw)] max-w-full min-h-56 rounded-xl border border-white/[0.07] bg-gradient-to-br from-emerald-500/[0.06] to-transparent p-5 hover:border-emerald-500/40">
-            <span className="text-[10px] font-mono text-emerald-400 mb-4">{repo.fork ? 'Fork' : 'Repository'} ↗</span>
-            <h3 className="font-semibold text-white break-words mb-2">{repo.name}</h3>
-            <p className="text-xs text-zinc-400 leading-relaxed line-clamp-3 break-words mb-5">{previews[repo.id] === undefined ? 'Loading README…' : previews[repo.id] === null ? 'README preview unavailable. View this project on GitHub.' : previews[repo.id] || 'Explore this project on GitHub.'}</p>
-            <div className="mt-auto flex flex-wrap gap-3 text-[10px] font-mono text-zinc-400"><span>{repo.language || 'Code'}</span><span>☆ {repo.stargazers_count}</span>{repo.archived && <span>Archived</span>}</div>
-          </a>
-        ))}
+
+      {loading && (
+        <p
+          role="status"
+          className="text-sm text-zinc-400 py-12"
+        >
+          Loading repositories…
+        </p>
+      )}
+
+      {error && !repos.length && (
+        <div
+          role="status"
+          className="text-sm text-zinc-400 mb-4"
+        >
+          {error}{' '}
+
+          <button
+            type="button"
+            className="text-emerald-400 underline"
+            onClick={() =>
+              setAttempt((value) => value + 1)
+            }
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {!loading &&
+        !error &&
+        !repos.length && (
+          <p className="text-sm text-zinc-400 py-12">
+            No starred repositories yet.
+          </p>
+        )}
+
+      {!!repos.length && (
+        <div
+          ref={viewport}
+          className="repo-viewport flex gap-4 overflow-x-auto pb-4"
+          aria-label="Starred GitHub repositories"
+          tabIndex={0}
+        >
+          {repos.map((repo) => (
+            <a
+              key={repo.id}
+              href={repo.html_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col shrink-0 w-[min(270px,85vw)] max-w-full min-h-56 rounded-xl border border-white/[0.07] bg-gradient-to-br from-emerald-500/[0.06] to-transparent p-5 hover:border-emerald-500/40 transition-colors"
+            >
+              <span className="text-[10px] font-mono text-emerald-400 mb-4">
+                {repo.fork
+                  ? 'Fork'
+                  : 'Repository'}{' '}
+                ↗
+              </span>
+
+              <h3 className="font-semibold text-white break-words mb-2">
+                {repo.name}
+              </h3>
+
+              <p className="text-xs text-zinc-400 leading-relaxed line-clamp-3 break-words mb-5">
+                {repo.description ||
+                  'Explore this project on GitHub.'}
+              </p>
+
+              <div className="mt-auto flex flex-wrap gap-3 text-[10px] font-mono text-zinc-400">
+                <span>
+                  {repo.language || 'Code'}
+                </span>
+
+                <span>
+                  ☆ {repo.stargazers_count}
+                </span>
+
+                {repo.archived && (
+                  <span>Archived</span>
+                )}
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-4 flex justify-between text-xs text-zinc-500">
+        <span>
+          {error && !repos.length
+            ? 'Repositories unavailable'
+            : `${repos.length} starred ${
+                repos.length === 1
+                  ? 'repo'
+                  : 'repos'
+              }`}
+        </span>
+
+        <a
+          href={`${socialsData.github}?tab=stars`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-emerald-400 hover:underline"
+        >
+          View GitHub ↗
+        </a>
       </div>
-      <div className="mt-4 flex justify-between text-xs text-zinc-500"><span>{repos.length} starred repos</span><a href={`${socialsData.github}?tab=stars`} target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:underline">View GitHub ↗</a></div>
     </section>
   )
 }
