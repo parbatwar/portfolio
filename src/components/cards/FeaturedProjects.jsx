@@ -114,7 +114,7 @@ export default function FeaturedProjects() {
       position = el.scrollLeft
 
       // Give the user time to manually browse
-      restUntil = performance.now() + 4000
+      restUntil = performance.now() + 2000
     }
 
     const syncPosition = () => {
