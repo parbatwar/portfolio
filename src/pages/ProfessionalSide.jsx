@@ -41,7 +41,7 @@ function AnimatedCard({ className, children }) {
     <motion.div
       className={`${className} transform-gpu`}
       variants={cardVariant}
-      initial="hidden"
+      initial={false}
       whileInView="visible"
       viewport={{ once: true, amount: 0.05 }}
     >
@@ -61,6 +61,8 @@ function ProfessionalSide() {
   const [activeSection, setActiveSection] = useState('intro')
 
   useEffect(() => {
+    // The section rail is hidden on phones; don't do scroll layout work there.
+    if (!window.matchMedia('(min-width: 768px)').matches) return
     const update = () => {
       let current = 'intro'
       for (const { id } of SECTIONS) {
@@ -86,7 +88,7 @@ function ProfessionalSide() {
     <div className="relative min-h-screen bg-[#050508] selection:bg-emerald-500/25 text-white">
 
       {/* Soft corner glows */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
+      <div className="fixed inset-0 z-0 pointer-events-none hidden md:block">
         <div className="absolute w-[500px] h-[500px] rounded-full bg-emerald-500/5 blur-[140px] -top-48 -left-48" />
         <div className="absolute w-[400px] h-[400px] rounded-full bg-indigo-500/5 blur-[120px] bottom-0 right-0" />
       </div>

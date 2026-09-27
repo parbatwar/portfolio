@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { socialsData } from '../../data/info'
+import { fetchStarredRepos, fetchReadme } from '../../data/github'
 
 const username = new URL(socialsData.github).pathname.split('/').filter(Boolean)[0]
-const cacheKey = `public-repos:${username}`
+const cacheKey = `starred-repos-v1:${username}`
 
 export default function FeaturedProjects() {
   const [repos, setRepos] = useState([])
@@ -10,6 +11,7 @@ export default function FeaturedProjects() {
   const [error, setError] = useState('')
   const [paused, setPaused] = useState(false)
   const [attempt, setAttempt] = useState(0)
+  const [previews, setPreviews] = useState({})
   const viewport = useRef(null)
 
   useEffect(() => {
@@ -24,16 +26,7 @@ export default function FeaturedProjects() {
         }
       } catch { /* Storage is optional. */ }
       try {
-        const next = []
-        for (let page = 1; ; page++) {
-          const response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/repos?type=owner&sort=updated&per_page=100&page=${page}`, {
-            signal: controller.signal, headers: { Accept: 'application/vnd.github+json' },
-          })
-          if (!response.ok) throw new Error('GitHub is temporarily unavailable. Please try again later.')
-          const batch = await response.json()
-          next.push(...batch)
-          if (batch.length < 100) break
-        }
+        const next = await fetchStarredRepos(username, controller.signal)
         setRepos(next)
         setError('')
         try { sessionStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), repos: next })) } catch { /* Optional cache. */ }
@@ -47,6 +40,25 @@ export default function FeaturedProjects() {
     const timer = window.setInterval(refresh, 300000)
     return () => { controller.abort(); window.clearInterval(timer) }
   }, [attempt])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    let index = 0
+    async function worker() {
+      while (index < repos.length && !controller.signal.aborted) {
+        const repo = repos[index++]
+        try {
+          const text = await fetchReadme(repo, controller.signal)
+          if (!controller.signal.aborted) setPreviews(previous => ({ ...previous, [repo.id]: text }))
+        } catch {
+          if (!controller.signal.aborted) setPreviews(previous => ({ ...previous, [repo.id]: null }))
+        }
+      }
+    }
+    // Load cards immediately; fetch at most three README previews at once.
+    void Promise.all([worker(), worker(), worker()])
+    return () => controller.abort()
+  }, [repos])
 
   useEffect(() => {
     const el = viewport.current
@@ -87,25 +99,25 @@ export default function FeaturedProjects() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <span className="text-[10px] font-mono tracking-widest text-emerald-400 uppercase">Projects</span>
-          <h2 className="text-2xl font-bold text-white">Public repositories</h2>
-          <p className="mt-1 text-xs text-zinc-500">Automatically updated from GitHub</p>
+          <h2 className="text-2xl font-bold text-white">Starred repositories</h2>
+          <p className="mt-1 text-xs text-zinc-500">My GitHub picks · automatically updated</p>
         </div>
         <button type="button" onClick={() => setPaused(!paused)} aria-pressed={paused} className="text-xs text-zinc-300 border border-white/10 rounded-full px-3 py-2 hover:text-emerald-400">{paused ? 'Resume motion' : 'Pause motion'}</button>
       </div>
       {loading && <p role="status" className="text-sm text-zinc-400 py-12">Loading repositories…</p>}
       {error && <div role="status" className="text-sm text-zinc-400 mb-4">{error} <button className="text-emerald-400 underline" onClick={() => setAttempt(attempt + 1)}>Retry</button></div>}
-      {!loading && !error && !repos.length && <p className="text-sm text-zinc-400 py-12">No public repositories yet.</p>}
-      <div ref={viewport} className="repo-viewport flex gap-4 overflow-x-auto pb-4" aria-label="Public GitHub repositories" tabIndex={0}>
+      {!loading && !error && !repos.length && <p className="text-sm text-zinc-400 py-12">No starred repositories yet.</p>}
+      <div ref={viewport} className="repo-viewport flex gap-4 overflow-x-auto pb-4" aria-label="Starred GitHub repositories" tabIndex={0}>
         {repos.map(repo => (
           <a key={repo.id} href={repo.html_url} target="_blank" rel="noopener noreferrer" className="flex flex-col shrink-0 w-[min(270px,85vw)] max-w-full min-h-56 rounded-xl border border-white/[0.07] bg-gradient-to-br from-emerald-500/[0.06] to-transparent p-5 hover:border-emerald-500/40">
             <span className="text-[10px] font-mono text-emerald-400 mb-4">{repo.fork ? 'Fork' : 'Repository'} ↗</span>
             <h3 className="font-semibold text-white break-words mb-2">{repo.name}</h3>
-            <p className="text-xs text-zinc-400 leading-relaxed line-clamp-3 mb-5">{repo.description || 'Explore this project on GitHub.'}</p>
+            <p className="text-xs text-zinc-400 leading-relaxed line-clamp-3 break-words mb-5">{previews[repo.id] === undefined ? 'Loading README…' : previews[repo.id] === null ? 'README preview unavailable. View this project on GitHub.' : previews[repo.id] || 'Explore this project on GitHub.'}</p>
             <div className="mt-auto flex flex-wrap gap-3 text-[10px] font-mono text-zinc-400"><span>{repo.language || 'Code'}</span><span>☆ {repo.stargazers_count}</span>{repo.archived && <span>Archived</span>}</div>
           </a>
         ))}
       </div>
-      <div className="mt-4 flex justify-between text-xs text-zinc-500"><span>{repos.length} public repos</span><a href={`${socialsData.github}?tab=repositories`} target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:underline">View GitHub ↗</a></div>
+      <div className="mt-4 flex justify-between text-xs text-zinc-500"><span>{repos.length} starred repos</span><a href={`${socialsData.github}?tab=stars`} target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:underline">View GitHub ↗</a></div>
     </section>
   )
 }
