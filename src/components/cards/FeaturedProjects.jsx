@@ -97,19 +97,23 @@ export default function FeaturedProjects() {
     let direction = 1
     let restUntil = 0
     let position = el.scrollLeft
-    let interacting = false
+    let manuallyInteracting = false
 
-    const startInteraction = () => {
-      interacting = true
+    const startManualInteraction = () => {
+      manuallyInteracting = true
     }
 
-    const stopInteraction = () => {
-      interacting = false
+    const stopManualInteraction = () => {
+      manuallyInteracting = false
+
+      // Wait briefly before auto-scroll resumes
       restUntil = performance.now() + 1500
     }
 
-    const userScroll = () => {
+    const userWheel = () => {
       position = el.scrollLeft
+
+      // Give the user time to manually browse
       restUntil = performance.now() + 4000
     }
 
@@ -130,9 +134,8 @@ export default function FeaturedProjects() {
       const shouldMove =
         !document.hidden &&
         !paused &&
-        !interacting &&
+        !manuallyInteracting &&
         !reducedMotion.matches &&
-        !el.contains(document.activeElement) &&
         time > restUntil &&
         max > 0
 
@@ -146,11 +149,14 @@ export default function FeaturedProjects() {
 
         el.scrollLeft = position
 
+        // Reverse direction when reaching an end
         if (
           position >= max ||
           (direction < 0 && position <= 0)
         ) {
           direction *= -1
+
+          // Pause briefly at each end
           restUntil = time + 2000
         }
       } else {
@@ -160,40 +166,45 @@ export default function FeaturedProjects() {
       frame = requestAnimationFrame(tick)
     }
 
-    el.addEventListener(
-      'pointerenter',
-      startInteraction
-    )
-
-    el.addEventListener(
-      'pointerleave',
-      stopInteraction
-    )
+    // Only actual interaction pauses movement.
+    // Hovering does NOT pause the carousel.
 
     el.addEventListener(
       'pointerdown',
-      startInteraction
+      startManualInteraction
     )
 
-    el.addEventListener(
+    window.addEventListener(
       'pointerup',
-      stopInteraction
+      stopManualInteraction
     )
 
-    el.addEventListener(
+    window.addEventListener(
       'pointercancel',
-      stopInteraction
-    )
-
-    el.addEventListener(
-      'touchstart',
-      userScroll,
-      { passive: true }
+      stopManualInteraction
     )
 
     el.addEventListener(
       'wheel',
-      userScroll,
+      userWheel,
+      { passive: true }
+    )
+
+    el.addEventListener(
+      'touchstart',
+      startManualInteraction,
+      { passive: true }
+    )
+
+    el.addEventListener(
+      'touchend',
+      stopManualInteraction,
+      { passive: true }
+    )
+
+    el.addEventListener(
+      'touchcancel',
+      stopManualInteraction,
       { passive: true }
     )
 
@@ -209,38 +220,38 @@ export default function FeaturedProjects() {
       cancelAnimationFrame(frame)
 
       el.removeEventListener(
-        'pointerenter',
-        startInteraction
-      )
-
-      el.removeEventListener(
-        'pointerleave',
-        stopInteraction
-      )
-
-      el.removeEventListener(
         'pointerdown',
-        startInteraction
+        startManualInteraction
       )
 
-      el.removeEventListener(
+      window.removeEventListener(
         'pointerup',
-        stopInteraction
+        stopManualInteraction
       )
 
-      el.removeEventListener(
+      window.removeEventListener(
         'pointercancel',
-        stopInteraction
-      )
-
-      el.removeEventListener(
-        'touchstart',
-        userScroll
+        stopManualInteraction
       )
 
       el.removeEventListener(
         'wheel',
-        userScroll
+        userWheel
+      )
+
+      el.removeEventListener(
+        'touchstart',
+        startManualInteraction
+      )
+
+      el.removeEventListener(
+        'touchend',
+        stopManualInteraction
+      )
+
+      el.removeEventListener(
+        'touchcancel',
+        stopManualInteraction
       )
 
       el.removeEventListener(
@@ -322,7 +333,6 @@ export default function FeaturedProjects() {
           ref={viewport}
           className="repo-viewport flex gap-4 overflow-x-auto pb-4"
           aria-label="Starred GitHub repositories"
-          tabIndex={0}
         >
           {repos.map((repo) => (
             <a

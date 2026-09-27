@@ -5,12 +5,15 @@ export default async function handler() {
   const token = process.env.GITHUB_TOKEN
 
   if (!token) {
-    return Response.json(
-      {
-        error: 'GitHub token is not configured.',
-      },
+    return new Response(
+      JSON.stringify({
+        error: 'GITHUB_TOKEN is missing on Netlify.',
+      }),
       {
         status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
     )
   }
@@ -33,16 +36,23 @@ export default async function handler() {
       )
 
       if (!response.ok) {
-        const body = await response.json().catch(() => ({}))
+        const body = await response.text()
 
-        return Response.json(
-          {
-            error:
-              body?.message ||
-              `GitHub request failed (${response.status}).`,
-          },
+        console.error(
+          'GitHub API error:',
+          response.status,
+          body
+        )
+
+        return new Response(
+          JSON.stringify({
+            error: `GitHub API failed with status ${response.status}.`,
+          }),
           {
             status: response.status,
+            headers: {
+              'Content-Type': 'application/json',
+            },
           }
         )
       }
@@ -56,7 +66,6 @@ export default async function handler() {
       }
     }
 
-    // Latest pushed/committed project first
     repos.sort((a, b) => {
       const aTime = a.pushed_at
         ? new Date(a.pushed_at).getTime()
@@ -82,26 +91,30 @@ export default async function handler() {
       pushed_at: repo.pushed_at,
     }))
 
-    return Response.json(cleanedRepos, {
-      headers: {
-        'Cache-Control':
-          'public, max-age=300, s-maxage=300, stale-while-revalidate=3600',
-      },
-    })
-  } catch (error) {
-    console.error(error)
-
-    return Response.json(
+    return new Response(
+      JSON.stringify(cleanedRepos),
       {
-        error: 'GitHub is temporarily unavailable.',
-      },
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control':
+            'public, max-age=300, s-maxage=300',
+        },
+      }
+    )
+  } catch (error) {
+    console.error('Function error:', error)
+
+    return new Response(
+      JSON.stringify({
+        error: 'GitHub function failed.',
+      }),
       {
         status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
     )
   }
-}
-
-export const config = {
-  path: '/api/github-starred',
 }
