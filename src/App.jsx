@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 
 import ProfessionalSide from './pages/ProfessionalSide'
 import NavCard from './components/cards/NavCard'
+const PersonalSide = lazy(() => import('./pages/PersonalSide'))
 
 function App() {
   const location = useLocation()
@@ -15,22 +16,9 @@ function App() {
       </header>
         <Routes>
           <Route path="/" element={<ProfessionalSide />} />
-          <Route path="/personal" element={<PersonalPage />} />
+          <Route path="/personal" element={<Suspense fallback={<main className="min-h-screen" aria-busy="true" />}><PersonalSide /></Suspense>} />
         </Routes>
     </div>
-  )
-}
-
-function PersonalPage() {
-  return (
-    <main aria-label="Personal" className="min-h-[calc(100svh-80px)] bg-[#050508] px-6 py-20 text-white">
-      <section className="mx-auto max-w-2xl rounded-2xl border border-white/10 bg-[#0d0d14] p-8 sm:p-12">
-        <p className="text-xs font-mono uppercase tracking-widest text-emerald-400">Beyond the work</p>
-        <h1 className="mt-5 text-4xl font-semibold tracking-tight">A little more personal.</h1>
-        <p className="mt-5 text-sm leading-relaxed text-zinc-400">A small space for life outside of code. More soon.</p>
-        <div aria-hidden="true" className="mt-10 h-px w-16 bg-emerald-400/60" />
-      </section>
-    </main>
   )
 }
 
