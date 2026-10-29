@@ -6,7 +6,6 @@ import { Link, useLocation } from 'react-router-dom'
 function NavCard() {
   const location = useLocation()
   const isWorkActive = location.pathname === '/' || location.pathname === ''
-  const isPersonalActive = location.pathname === '/personal'
 
   return (
     <motion.nav
@@ -33,22 +32,6 @@ function NavCard() {
             />
           )}
           Professional
-        </Link>
-        <Link 
-          to="/personal"
-          aria-current={isPersonalActive ? 'page' : undefined}
-          className={`relative px-5 py-1.5 text-xs font-semibold font-mono rounded-full tracking-wide transition-colors duration-300 ${
-            isPersonalActive ? 'text-white' : 'text-zinc-500 hover:text-zinc-200'
-          }`}
-        >
-          {isPersonalActive && (
-            <motion.span
-              layoutId="navActiveBubble"
-              className="absolute inset-0 bg-white/[0.08] border border-white/[0.08] rounded-full -z-10"
-              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-            />
-          )}
-          Personal
         </Link>
       </div>
     </motion.nav>
