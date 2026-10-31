@@ -71,9 +71,6 @@ export default function ContactScene() {
             © {new Date().getFullYear()} {heroData.name}
           </span>
           <div>
-            <a href={socialsData.github} target="_blank" rel="noopener noreferrer">
-              GitHub ↗
-            </a>
             <a href="#intro">Back to top ↑</a>
           </div>
         </footer>
