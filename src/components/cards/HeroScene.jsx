@@ -52,7 +52,9 @@ export default function HeroScene() {
         </h1>
       </motion.div>
       <div className="immersive-bottom">
+        <a href="#about">Explore the person behind the work ↓</a>
         <button type="button" aria-pressed={paused} onClick={() => setPaused(!paused)}>
+          {paused ? 'Play motion' : 'Pause motion'}
         </button>
       </div>
       <MagneticLink

@@ -210,6 +210,7 @@ export default function FeaturedProjects() {
           aria-pressed={paused}
           className="feed-control"
         >
+          {paused ? 'Resume motion' : 'Pause motion'}
         </button>
       </div>
       {loading && (
