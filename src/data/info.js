@@ -11,7 +11,7 @@ export const heroData = {
   firstName: 'Parbat',
   lastName: 'Sunuwar',
   email: 'parbatwar@gmail.com',
-  tagline: ['Coding', 'Automating', 'Marketing'],
+  tagline: ['Marketing', 'Automation', 'Engineer'],
 }
     
 // ABOUT CARD DATA
