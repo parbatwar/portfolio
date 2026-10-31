@@ -11,12 +11,5 @@ root.render(
     <BrowserRouter>
       <App />
     </BrowserRouter>
-  </React.StrictMode>
+  </React.StrictMode>,
 )
-
-// remove loader after first paint
-requestAnimationFrame(() => {
-  setTimeout(() => {
-    document.getElementById('initial-loader')?.remove()
-  }, 150)
-})

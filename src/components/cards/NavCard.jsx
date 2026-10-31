@@ -1,41 +1,68 @@
-// components/cards/NavCard.jsx (removed the P logo)
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { heroData, navigationData } from '../../data/info'
 
-import { motion } from 'framer-motion'
-import { Link, useLocation } from 'react-router-dom'
+export default function NavCard() {
+  const [open, setOpen] = useState(false)
+  const [active, setActive] = useState('intro')
+  const [scrolled, setScrolled] = useState(false)
 
-function NavCard() {
-  const location = useLocation()
-  const isWorkActive = location.pathname === '/' || location.pathname === ''
+  useEffect(() => {
+    const update = () => setScrolled(window.scrollY > 80)
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    return () => window.removeEventListener('scroll', update)
+  }, [])
+
+  useEffect(() => {
+    const sections = ['intro', ...navigationData.map((item) => item.id)]
+      .map((id) => document.getElementById(id))
+      .filter(Boolean)
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.find((entry) => entry.isIntersecting)
+        if (visible) setActive(visible.target.id)
+      },
+      { rootMargin: '-15% 0px -55% 0px' },
+    )
+
+    sections.forEach((section) => observer.observe(section))
+    return () => observer.disconnect()
+  }, [])
 
   return (
-    <motion.nav
-      initial={{ y: -30, opacity: 0, scale: 0.95 }}
-      animate={{ y: 0, opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
-      className="inline-flex items-center justify-between gap-5 rounded-full bg-[#0d0d14]/75 backdrop-blur-xl border border-white/[0.06] px-4 py-2 z-50 shadow-lg shadow-black/20"
-      style={{ width: 'auto', margin: '0 auto' }}
-    >
-      {/* Nav Links with layoutId indicators */}
-      <div className="flex items-center gap-1 relative">
-        <Link 
-          to="/"
-          aria-current={isWorkActive ? 'page' : undefined}
-          className={`relative px-5 py-1.5 text-xs font-semibold font-mono rounded-full tracking-wide transition-colors duration-300 ${
-            isWorkActive ? 'text-white' : 'text-zinc-500 hover:text-zinc-200'
-          }`}
+    <header className={scrolled ? 'site-header is-scrolled' : 'site-header'}>
+      <nav className="portfolio-shell nav-inner" aria-label="Main navigation">
+        <a className="wordmark" href="#intro" onClick={() => setOpen(false)}>
+          {heroData.firstName}
+          <span>.</span>
+        </a>
+        <button
+          className="menu-toggle"
+          type="button"
+          aria-expanded={open}
+          aria-controls="section-navigation"
+          onClick={() => setOpen(!open)}
         >
-          {isWorkActive && (
-            <motion.span
-              layoutId="navActiveBubble"
-              className="absolute inset-0 bg-white/[0.08] border border-white/[0.08] rounded-full -z-10"
-              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-            />
-          )}
-          Professional
-        </Link>
-      </div>
-    </motion.nav>
+          {open ? 'Close −' : 'Menu +'}
+        </button>
+        <div id="section-navigation" className={open ? 'nav-links is-open' : 'nav-links'}>
+          {navigationData.map(({ id, label }) => (
+            <a
+              key={id}
+              href={`#${id}`}
+              aria-current={active === id ? 'location' : undefined}
+              onClick={() => setOpen(false)}
+            >
+              {label}
+            </a>
+          ))}
+          {/* <Link to="/personal" onClick={() => setOpen(false)}>
+            Beyond work ↗
+          </Link> */}
+        </div>
+      </nav>
+    </header>
   )
 }
-
-export default NavCard

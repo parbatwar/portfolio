@@ -1,29 +1,19 @@
-import { useRef } from 'react'
-import { motion } from 'framer-motion'
+import { heroData } from '../../data/info'
 
-function ProfilePictureCard() {
+export default function ProfilePictureCard() {
   return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.3 }}
-      className="relative w-full h-full min-h-[360px] bg-[#0d0d14] border border-white/[0.04] rounded-2xl overflow-hidden group cursor-pointer"
-    >
-      {/* Image */}
+    <figure className="portrait">
       <img
         src="/Parbat.webp"
-        alt="Parbat Sunuwar"
+        alt={heroData.name}
+        width="600"
+        height="760"
         fetchPriority="high"
-        loading="eager"
-        className="w-full h-full object-cover object-center absolute inset-0
-                   brightness-75 group-hover:brightness-95
-                   transition-all duration-300 ease-out"
       />
-      
-      {/* Dark gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#050508] via-[#050508]/20 to-transparent z-10" />
-
-    </motion.div>
+      <figcaption>
+        <span>{heroData.firstName}</span>
+        <span>Developer. Data enthusiast.</span>
+      </figcaption>
+    </figure>
   )
 }
-
-export default ProfilePictureCard

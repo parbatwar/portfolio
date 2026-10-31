@@ -1,39 +1,48 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { fetchStarredRepos, fetchReadme, readmeExcerpt } from '../src/data/github.js'
+import { fetchStarredRepos } from '../src/data/github.js'
 
-test('README preview removes markup and bounds long excerpts', () => {
-  assert.equal(readmeExcerpt('# Project\n![badge](badge.png)\nA **useful** [tool](https://example.com).\n```js\ncode\n```'), 'Project A useful tool.')
-  assert.equal(readmeExcerpt('x'.repeat(800)).length, 601)
-  assert.ok(readmeExcerpt('x'.repeat(800)).endsWith('…'))
+test('prefers the server response and sorts by latest activity', async (t) => {
+  const fetch = t.mock.method(globalThis, 'fetch', async () => Response.json([
+    { id: 1, pushed_at: '2025-01-01' },
+    { id: 2, pushed_at: '2026-01-01' },
+  ]))
+
+  assert.deepEqual((await fetchStarredRepos()).map((repo) => repo.id), [2, 1])
+  assert.equal(fetch.mock.callCount(), 1)
 })
 
-test('starred API follows pagination and never requests owned repositories', async t => {
-  const calls = []
-  t.mock.method(globalThis, 'fetch', async url => {
-    calls.push(url)
-    return Response.json(calls.length === 1 ? Array.from({ length: 100 }, (_, id) => ({ id })) : [{ id: 100 }])
+test('falls back from a static HTML response and paginates public stars', async (t) => {
+  const urls = []
+  t.mock.method(globalThis, 'fetch', async (url) => {
+    urls.push(url)
+    if (urls.length === 1) return new Response('<html>Vite</html>')
+    if (urls.length === 2) return Response.json(Array.from({ length: 100 }, (_, id) => ({ id })))
+    return Response.json([{ id: 100 }])
   })
-  const result = await fetchStarredRepos('parbatwar', new AbortController().signal)
-  assert.equal(result.length, 101)
-  assert.ok(calls.every(url => url.includes('/users/parbatwar/starred?')))
-  assert.ok(calls[1].endsWith('page=2'))
+
+  assert.equal((await fetchStarredRepos()).length, 101)
+  assert.match(urls[1], /users\/parbatwar\/starred\?per_page=100&page=1$/)
+  assert.match(urls[2], /page=2$/)
 })
 
-test('missing README uses empty fallback; API failures stay distinct', async t => {
-  const repo = { full_name: 'owner/repo', pushed_at: 'now' }
-  const fetch = t.mock.method(globalThis, 'fetch', async () => new Response('', { status: 404 }))
-  assert.equal(await fetchReadme(repo, new AbortController().signal), '')
-  fetch.mock.mockImplementation(async () => new Response('', { status: 403 }))
-  await assert.rejects(fetchReadme(repo, new AbortController().signal), /unavailable/)
-  await assert.rejects(fetchStarredRepos('parbatwar', new AbortController().signal), /unavailable/)
-})
-
-test('README fetch returns readable text from raw content', async t => {
-  t.mock.method(globalThis, 'fetch', async (url, options) => {
-    assert.ok(url.endsWith('/repos/owner/repo/readme'))
-    assert.equal(options.headers.Accept, 'application/vnd.github.raw+json')
-    return new Response('# Hello\nA small project.')
+test('does not start a fallback after cancellation', async (t) => {
+  const controller = new AbortController()
+  const fetch = t.mock.method(globalThis, 'fetch', async () => {
+    controller.abort()
+    throw new DOMException('Aborted', 'AbortError')
   })
-  assert.equal(await fetchReadme({ full_name: 'owner/repo' }, new AbortController().signal), 'Hello A small project.')
+
+  await assert.rejects(fetchStarredRepos(controller.signal), { name: 'AbortError' })
+  assert.equal(fetch.mock.callCount(), 1)
+})
+
+test('reports a public API rate limit instead of returning invalid data', async (t) => {
+  let calls = 0
+  t.mock.method(globalThis, 'fetch', async () => {
+    calls++
+    return Response.json({}, { status: calls === 1 ? 404 : 403 })
+  })
+
+  await assert.rejects(fetchStarredRepos(), /request limit/)
 })

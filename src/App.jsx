@@ -1,18 +1,21 @@
 import { useEffect } from 'react'
-import { Navigate, Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 
 import ProfessionalSide from './pages/ProfessionalSide'
+import PersonalSide from './pages/PersonalSide'
 
 function App() {
   const location = useLocation()
-  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }) }, [location.pathname])
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [location.pathname])
 
   return (
-    <div className="bg-[#0a0a0f]">
-        <Routes>
-          <Route path="/" element={<ProfessionalSide />} />
-          <Route path="/personal" element={<Navigate to="/" replace />} />
-        </Routes>
+    <div>
+      <Routes>
+        <Route path="/" element={<ProfessionalSide />} />
+        <Route path="/personal" element={<PersonalSide />} />
+      </Routes>
     </div>
   )
 }
