@@ -26,5 +26,3 @@ dist-ssr
 .env
 .env.local
 .env.*.local
-# Local documents that must never be published
-.private/
