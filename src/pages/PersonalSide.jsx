@@ -1,96 +1,75 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { motion, MotionConfig, useReducedMotion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import {
+  FaSpotify,
+  FaYoutube,
+  FaInstagram,
+  FaSoundcloud,
+  FaPinterestP,
+} from 'react-icons/fa'
+import { SiLetterboxd } from 'react-icons/si'
 import { personalData } from '../data/personal'
 import './personal.css'
 
-function Keepsake({ id }) {
-  if (id === 'listening') {
-    return (
-      <div className="desk-vinyl">
-        <div className="vinyl-label">
-          <span>ON REPEAT</span>
-          <strong>P.</strong>
-          <span>SIDE A / SPOTIFY</span>
-        </div>
-      </div>
-    )
-  }
-  if (id === 'films') {
-    return (
-      <div className="desk-ticket">
-        <div className="ticket-main">
-          <span>ADMIT ONE / LETTERBOXD</span>
-          <strong>
-            After the
-            <br />
-            credits.
-          </strong>
-          <span>PARBAT’S WATCHLIST</span>
-        </div>
-        <div className="ticket-stub">
-          <span>SEAT</span>
-          <strong>01</strong>
-          <div className="ticket-barcode" />
-        </div>
-      </div>
-    )
-  }
-  if (id === 'vlogs') {
-    return (
-      <div className="desk-video">
-        <div className="video-top">
-          <span>MAACHA PRODUCTIONS</span>
-          <span>REC ●</span>
-        </div>
-        <div className="video-screen">
-          <span className="video-play">▶</span>
-          <strong>
-            Life,
-            <br />
-            recorded.
-          </strong>
-        </div>
-        <div className="video-bottom">
-          <span>OUTSIDE THE FRAME</span>
-          <span>↗</span>
-        </div>
-      </div>
-    )
-  }
-  if (id === 'making') {
-    return (
-      <div className="desk-tape">
-        <div className="tape-label">
-          <span>WARBAT MUSIC</span>
-          <strong>Made by me.</strong>
-          <div className="tape-reels">
-            <i />
-            <span />
-            <i />
-          </div>
-        </div>
-        <div className="tape-bottom">
-          <span>A</span>
-          <span>ORIGINAL SOUNDS</span>
-          <span>♫</span>
-        </div>
-      </div>
-    )
-  }
+const platformIcons = {
+  listening: FaSpotify,
+  films: SiLetterboxd,
+  vlogs: FaYoutube,
+  making: FaYoutube,
+  soundcloud: FaSoundcloud,
+  snapshots: FaInstagram,
+  pinterest: FaPinterestP,
+}
+
+function InterestTile({ interest, index }) {
+  const reduced = useReducedMotion()
+  const Icon = platformIcons[interest.id]
+
   return (
-    <div className="desk-photo">
-      <img src="/Parbat.webp" width="800" height="1000" alt="" loading="lazy" />
-      <span>the bits in between. ↗</span>
-    </div>
+    <motion.article
+      className={`personal-tile personal-tile-${interest.id}`}
+      style={{ '--platform-color': interest.color }}
+      initial={reduced ? false : { opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{
+        duration: 0.45,
+        delay: reduced ? 0 : index * 0.045,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+    >
+      <a
+        className="personal-tile-link"
+        href={interest.links[0].url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${interest.label} — ${interest.links[0].label} (opens in a new tab)`}
+      >
+        {interest.image ? (
+          <img
+            className="personal-platform-icon personal-club-crest"
+            src={interest.image}
+            alt=""
+            width="64"
+            height="64"
+          />
+        ) : (
+          <Icon className="personal-platform-icon" aria-hidden="true" />
+        )}
+        <div>
+          <span className="personal-tile-platform">{interest.platform}</span>
+          <h2>{interest.label}</h2>
+        </div>
+        <span className="personal-tile-arrow" aria-hidden="true">
+          ↗
+        </span>
+      </a>
+    </motion.article>
   )
 }
 
 export default function PersonalSide() {
-  const [activeId, setActiveId] = useState(null)
-  const reduced = useReducedMotion()
-  const active = personalData.interests.find((interest) => interest.id === activeId)
-
   useEffect(() => {
     const previousTitle = document.title
     document.title = 'Parbat Sunuwar | Beyond work'
@@ -112,83 +91,23 @@ export default function PersonalSide() {
           <Link to="/">Back to work ↗</Link>
         </header>
         <main id="personal-content" className="personal-room">
-          <div className="personal-intro">
+          <section className="personal-intro" aria-labelledby="personal-title">
             <div>
-              <p className="personal-label">BEYOND WORK</p>
-              <h1>
-                A few things
-                <br />
-                that feel like <em>me.</em>
+              <p className="personal-label">Let’s connect outside of work</p>
+              <h1 id="personal-title">
+                Beyond
+                <span>
+                  work<span className="personal-period">.</span>
+                </span>
               </h1>
             </div>
-            <p>
-              Less of a bio.
-              <br />
-              More of a collection.
-              <br />
-              <span>Pick something up ↘</span>
-            </p>
-          </div>
-          <div className="personal-desk" aria-label="My personal collection">
-            <span className="desk-scribble" aria-hidden="true">
-              a little of everything.
-            </span>
+          </section>
+          <section className="personal-bento" aria-label="My interests and channels">
             {personalData.interests.map((interest, index) => (
-              <motion.article
-                key={interest.id}
-                className={`desk-item desk-item-${interest.id}`}
-                initial={reduced ? false : { opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, delay: reduced ? 0 : index * 0.06 }}
-                onPointerEnter={() => setActiveId(interest.id)}
-                onPointerLeave={() => setActiveId(null)}
-                onFocus={() => setActiveId(interest.id)}
-                onBlur={(event) => {
-                  if (!event.currentTarget.contains(event.relatedTarget))
-                    setActiveId(null)
-                }}
-              >
-                <a
-                  className="keepsake-link"
-                  href={interest.links[0].url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${interest.links[0].label} (opens in a new tab)`}
-                >
-                  <div className="keepsake-art" aria-hidden="true">
-                    <Keepsake id={interest.id} />
-                  </div>
-                  <span className="keepsake-caption">
-                    <span>{interest.label}</span>
-                    <span>{interest.links[0].label} ↗</span>
-                  </span>
-                </a>
-                {interest.links.slice(1).map((link) => (
-                  <a
-                    className="keepsake-extra"
-                    key={link.url}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Or {link.label} ↗
-                  </a>
-                ))}
-              </motion.article>
+              <InterestTile key={interest.id} interest={interest} index={index} />
             ))}
-          </div>
-          <div className="desk-note">
-            <span aria-hidden="true">↳</span>
-            <p>
-              {active?.note ||
-                'A soundtrack, a watchlist, a camera. A few ways into my world.'}
-            </p>
-          </div>
+          </section>
         </main>
-        <footer className="personal-footer">
-          <span>Same person. Different tabs.</span>
-          <Link to="/">Back to the professional side ↗</Link>
-        </footer>
       </div>
     </MotionConfig>
   )

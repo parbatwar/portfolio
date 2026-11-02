@@ -6,7 +6,7 @@ import {
   useSpring,
   useTransform,
 } from 'framer-motion'
-import { heroData, socialsData } from '../../data/info'
+import { heroData } from '../../data/info'
 import MagneticLink from './MagneticLink'
 import ContactForm from './ContactForm'
 import SocialsCard from './SocialsCard'

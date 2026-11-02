@@ -1002,7 +1002,7 @@
 }
 
 #about {
-  padding-bottom: 65px;
+  padding-block: 105px;
 }
 
 #work {
@@ -1054,7 +1054,7 @@
     bottom: 32%;
   }
   #about {
-    padding-bottom: 45px;
+    padding-block: 80px;
   }
   .work-history {
     padding-block: 65px 75px;

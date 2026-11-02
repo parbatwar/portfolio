@@ -29,6 +29,8 @@ export default function HeroScene() {
           alt={heroData.name}
           width="800"
           height="1000"
+          loading="eager"
+          decoding="async"
           fetchPriority="high"
         />
       </motion.div>
@@ -58,14 +60,13 @@ export default function HeroScene() {
         </button>
       </div>
       <MagneticLink
-        href="/resume.pdf"
-        download="Parbat_Sunuwar_CV.pdf"
+        href="/personal"
         className="hero-orbit"
-        label="Download my resume"
+        label="Beyond work"
       >
-        Download
+        Beyond
         <br />
-        resume <span aria-hidden="true">↓</span>
+        work <span aria-hidden="true">↗</span>
       </MagneticLink>
     </section>
   )

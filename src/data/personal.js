@@ -1,14 +1,12 @@
 // The personal page is one small collection. Edit names, notes and links here.
 export const personalData = {
   title: ['A little less work.', 'A little more me.'],
-  introduction: 'Music, films, and little bits of life. Pick a rabbit hole.',
   interests: [
     {
       id: 'listening',
+      color: '#1DB954',
       label: 'On repeat',
       platform: 'Spotify',
-      title: 'There is usually music playing.',
-      note: 'It started with Linkin Park. The rest is in the rotation.',
       links: [
         {
           label: 'My Spotify',
@@ -18,40 +16,59 @@ export const personalData = {
     },
     {
       id: 'films',
+      color: '#00AC1C',
       label: 'After the credits',
       platform: 'Letterboxd',
-      title: 'Some films stay with you.',
-      note: 'Parasite. Memories of Murder. Inglourious Basterds. The Pianist.',
       links: [{ label: 'My Letterboxd', url: 'https://letterboxd.com/parbatwar/' }],
     },
     {
       id: 'vlogs',
-      label: 'Life, recorded',
+      color: '#FF0000',
+      label: 'Maacha Times',
       platform: 'YouTube',
-      title: 'Away from the desk.',
-      note: 'Little pieces of life, over at Maacha Productions.',
       links: [
         { label: 'Watch my vlogs', url: 'https://www.youtube.com/@maachaproductions' },
       ],
     },
     {
       id: 'making',
-      label: 'Made by me',
-      platform: 'YouTube / SoundCloud',
-      title: 'Not just listening. Making.',
-      note: 'My own sounds, under Warbat Music.',
-      links: [
-        { label: 'YouTube', url: 'https://www.youtube.com/@WarbatMusic' },
-        { label: 'SoundCloud', url: 'https://soundcloud.com/warbatmusic/tracks' },
-      ],
+      color: '#FF0000',
+      label: 'Warbat Music',
+      platform: 'YouTube',
+      links: [{ label: 'YouTube', url: 'https://www.youtube.com/@WarbatMusic' }],
+    },
+    {
+      id: 'soundcloud',
+      color: '#FF5500',
+      label: 'Warbat Music',
+      platform: 'SoundCloud',
+      links: [{ label: 'SoundCloud', url: 'https://soundcloud.com/warbatmusic/tracks' }],
     },
     {
       id: 'snapshots',
+      color: '#E4405F',
       label: 'In between',
       platform: 'Instagram',
-      title: 'The bits in between.',
-      note: 'Find me at @bythehill_.',
       links: [{ label: 'My Instagram', url: 'https://www.instagram.com/bythehill_/' }],
+    },
+    {
+      id: 'chelsea',
+      color: '#2566DB',
+      label: 'Chelsea FC',
+      platform: 'Football',
+      image: '/chelsea-crest.svg',
+      links: [
+        { label: 'Chelsea FC official website', url: 'https://www.chelseafc.com/en' },
+      ],
+    },
+    {
+      id: 'pinterest',
+      color: '#E60023',
+      label: 'Saved for later',
+      platform: 'Pinterest',
+      links: [
+        { label: 'My Pinterest', url: 'https://www.pinterest.com/parbatwar/_profile/' },
+      ],
     },
   ],
 }

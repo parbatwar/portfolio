@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/code.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Start fetching the hero portrait before React renders. -->
+    <link
+      rel="preload"
+      as="image"
+      type="image/webp"
+      href="/Parbat.webp"
+      fetchpriority="high"
+    />
     <meta
       name="description"
       content="Parbat Sunuwar — Marketing Automation Engineer for brands. Klaviyo & Omnisend flows, Python API integrations, automated reporting, and AI workflows."

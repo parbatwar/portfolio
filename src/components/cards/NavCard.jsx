@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { heroData, navigationData } from '../../data/info'
 
 export default function NavCard() {

@@ -9,9 +9,6 @@ export default function AboutCard() {
         <p>{aboutData.description1}</p>
         <p>{aboutData.description2}</p>
       </div>
-      <a className="button-text" href="/resume.pdf" download="Parbat_Sunuwar_CV.pdf">
-        Download my resume <span aria-hidden="true">↓</span>
-      </a>
     </div>
   )
 }
