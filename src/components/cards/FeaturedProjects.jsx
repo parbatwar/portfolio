@@ -202,7 +202,6 @@ export default function FeaturedProjects() {
             <h3>
             Projects<span className="accent-dot">.</span>
             </h3>
-          <p>Things I've built. A live collection of projects worth a closer look.</p>
         </div>
         <button
           type="button"
@@ -258,9 +257,6 @@ export default function FeaturedProjects() {
       )}
       <div className="feed-footer">
         <span>
-          {error && !repos.length
-            ? 'Browse directly on GitHub'
-            : `${repos.length} starred repositories`}
         </span>
         <a
           href={`${socialsData.github}?tab=stars`}
